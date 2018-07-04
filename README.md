@@ -41,7 +41,6 @@ Required Plugins:
 {
   "editor.formatOnSave": false,
   "tslint.autoFixOnSave": true,
-  "eslint.enable": false,
   "javascript.format.enable": false
 }
 ```
