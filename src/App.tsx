@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import ImageCircle from "./assets/circle.png";
-import ImageCross from "./assets/cross.png";
-import ImageTile from "./assets/tile.png";
-import ImageTime from "./assets/time.png";
 import ActionButton from "./components/ActionButton";
+
+const ImageCross = require("./assets/cross.png");
+const ImageTile = require("./assets/tile.png");
+const ImageTime = require("./assets/time.png");
+const ImageCircle = require("./assets/circle.png");
 
 const screenWidth = Dimensions.get("window").width;
 const tileSize = screenWidth / 15;
