@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import ImageTile from "./assets/tile.png";
 import ImageCircle from "./assets/circle.png";
 import ImageCross from "./assets/cross.png";
+import ImageTile from "./assets/tile.png";
 import ImageTime from "./assets/time.png";
+import ActionButton from "./components/ActionButton";
 
 const screenWidth = Dimensions.get("window").width;
 const tileSize = screenWidth / 15;
@@ -56,17 +57,9 @@ export default class App extends Component {
           </View>
         </View>
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonLabel}>REDO</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonLabel}>DRAW</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: "#c0392b" }]}
-          >
-            <Text style={styles.buttonLabel}>GIVE UP</Text>
-          </TouchableOpacity>
+          <ActionButton label={"redo"} />
+          <ActionButton label={"draw"} />
+          <ActionButton label={"give up"} isRed={true} />
         </View>
         <View style={styles.board}>
           {[...Array(15)].map((v, i) => (
@@ -178,16 +171,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: 270,
     justifyContent: "space-between"
-  },
-  button: {
-    borderRadius: 4,
-    width: 80,
-    height: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "black"
-  },
-  buttonLabel: {
-    color: "white"
   }
 });
