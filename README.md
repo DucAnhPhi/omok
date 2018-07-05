@@ -40,6 +40,7 @@ Required Plugins:
 ```
 {
   "editor.formatOnSave": true,
+  "tslint.autoFixOnSave": true,
   "javascript.format.enable": false
 }
 ```
