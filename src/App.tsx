@@ -8,14 +8,12 @@ import {
   View
 } from "react-native";
 import ActionButton from "./components/ActionButton";
+import Board from "./components/Board";
 
 const ImageCross = require("./assets/cross.png");
-const ImageTile = require("./assets/tile.png");
 const ImageTime = require("./assets/time.png");
 const ImageCircle = require("./assets/circle.png");
 
-const screenWidth = Dimensions.get("window").width;
-const tileSize = screenWidth / 15;
 export default class App extends Component {
   render() {
     return (
@@ -28,10 +26,7 @@ export default class App extends Component {
             </View>
             <View style={styles.playerStats}>
               <View style={styles.playerType}>
-                <Image
-                  source={ImageCross}
-                  style={{ width: tileSize, height: tileSize }}
-                />
+                <Image source={ImageCross} style={{ width: 20, height: 20 }} />
               </View>
               <View style={styles.playerTime}>
                 <Text style={{ color: "red", fontSize: 20 }}> 5:00</Text>
@@ -45,10 +40,7 @@ export default class App extends Component {
             </View>
             <View style={styles.playerStats}>
               <View style={styles.playerType}>
-                <Image
-                  source={ImageCircle}
-                  style={{ width: tileSize, height: tileSize }}
-                />
+                <Image source={ImageCircle} style={{ width: 20, height: 20 }} />
               </View>
               <View style={styles.playerTime}>
                 <Text style={{ color: "black", fontSize: 20 }}> 5:00</Text>
@@ -62,44 +54,7 @@ export default class App extends Component {
           <ActionButton label={"draw"} />
           <ActionButton label={"give up"} isRed={true} />
         </View>
-        <View style={styles.board}>
-          {[...Array(15)].map((v, i) => (
-            <View style={styles.row} key={i}>
-              {[...Array(15)].map((val, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={{
-                    position: "relative"
-                  }}
-                >
-                  <Image
-                    source={ImageTile}
-                    style={{
-                      width: tileSize,
-                      height: tileSize
-                    }}
-                  />
-                  {/* <Image
-                    source={ImageCross}
-                    style={{
-                      width: tileSize,
-                      height: tileSize,
-                      position: "absolute"
-                    }}
-                  />
-                  <Image
-                    source={ImageCircle}
-                    style={{
-                      width: tileSize,
-                      height: tileSize,
-                      position: "absolute"
-                    }}
-                  /> */}
-                </TouchableOpacity>
-              ))}
-            </View>
-          ))}
-        </View>
+        <Board />
       </View>
     );
   }
@@ -155,17 +110,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row"
-  },
-  board: {
-    flex: 1,
-    marginTop: 20
-  },
-  row: {
-    flexDirection: "row"
-  },
-  field: {
-    height: tileSize,
-    width: tileSize
   },
   actionButtons: {
     marginTop: 20,
