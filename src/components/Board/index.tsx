@@ -34,6 +34,96 @@ const limitYVal = yVal => {
   }
   return yVal;
 };
+
+const checkRow = (row, col, positions, currentToken) => {
+  let inALine = 0;
+  for (let colOffset = 1; colOffset < 5; colOffset++) {
+    if (positions[row][col + colOffset] === currentToken) {
+      inALine++;
+    } else {
+      break;
+    }
+  }
+  if (inALine === 4) {
+    alert("win");
+    return true;
+  }
+};
+
+const checkColumn = (row, col, positions, currentToken) => {
+  let inALine = 0;
+  for (let rowOffset = 1; rowOffset < 5; rowOffset++) {
+    if (positions[row + rowOffset][col] === currentToken) {
+      inALine++;
+    } else {
+      break;
+    }
+  }
+  if (inALine === 4) {
+    alert("win");
+    return true;
+  }
+};
+
+const checkDiagonalRight = (row, col, positions, currentToken) => {
+  let inALine = 0;
+  for (let offset = 1; offset < 5; offset++) {
+    if (positions[row + offset][col + offset] === currentToken) {
+      inALine++;
+    } else {
+      break;
+    }
+  }
+  if (inALine === 4) {
+    alert("win");
+    return true;
+  }
+};
+
+const checkDiagonalLeft = (row, col, positions, currentToken) => {
+  let inALine = 0;
+  for (let offset = 1; offset < 5; offset++) {
+    if (positions[row + offset][col - offset] === currentToken) {
+      inALine++;
+    } else {
+      break;
+    }
+  }
+  if (inALine === 4) {
+    alert("win");
+    return true;
+  }
+};
+
+const checkVictory = (token: boolean, positions: any[][]) => {
+  for (let row = 0; row < positions.length; row++) {
+    for (let col = 0; col < positions[row].length; col++) {
+      const currentToken = positions[row][col];
+      if (currentToken === undefined) {
+        continue;
+      }
+      const overBottomLimit = row + 4 > 14;
+      const overRightLimit = col + 4 > 14;
+      const overLeftLimit = col - 4 < 0;
+      // lookup the next 4 same tokens on the right if col + 4 <15
+      if (!overRightLimit) {
+        checkRow(row, col, positions, currentToken);
+      }
+      // lookup the next 4 same tokens south if row + 4 <15
+      if (!overBottomLimit) {
+        checkColumn(row, col, positions, currentToken);
+      }
+      // lookup the next 4 same tokens diagonally right if col+4<15 && row+4<15
+      if (!overRightLimit && !overBottomLimit) {
+        checkDiagonalRight(row, col, positions, currentToken);
+      }
+      // lookup the next 4 same tokens diagonally left if col-4 >=0 && row+4<15
+      if (!overLeftLimit && !overBottomLimit) {
+        checkDiagonalLeft(row, col, positions, currentToken);
+      }
+    }
+  }
+};
 export default class Board extends React.Component<undefined, State> {
   panResponder: PanResponderInstance;
 
@@ -77,6 +167,7 @@ export default class Board extends React.Component<undefined, State> {
         newBoardPositions[this.state.cursorY][
           this.state.cursorX
         ] = this.state.isPlayerOne;
+        checkVictory(this.state.isPlayerOne, newBoardPositions);
         this.setState({
           cursorActive: false,
           boardPositions: newBoardPositions,
