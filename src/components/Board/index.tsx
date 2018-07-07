@@ -21,6 +21,8 @@ interface State {
   cursorY: number;
   boardPositionY: number;
   cursorActive: boolean;
+  boardPositions: any[][];
+  isPlayerOne: boolean;
 }
 
 const limitYVal = yVal => {
@@ -41,7 +43,9 @@ export default class Board extends React.Component<undefined, State> {
       cursorX: 0,
       cursorY: 0,
       boardPositionY: 0,
-      cursorActive: false
+      cursorActive: false,
+      boardPositions: [...Array(15)].map(() => [...Array(15)]),
+      isPlayerOne: true
     };
 
     // touch gesture logic
@@ -68,8 +72,16 @@ export default class Board extends React.Component<undefined, State> {
         });
       },
       onPanResponderRelease: (evt, gestureState) => {
+        // place token at the position
+        const newBoardPositions = this.state.boardPositions.slice();
+        newBoardPositions[this.state.cursorY][
+          this.state.cursorX
+        ] = this.state.isPlayerOne;
         this.setState({
-          cursorActive: false
+          cursorActive: false,
+          boardPositions: newBoardPositions,
+          // change turn
+          isPlayerOne: !this.state.isPlayerOne
         });
       }
     });
@@ -91,15 +103,16 @@ export default class Board extends React.Component<undefined, State> {
   }
 
   render() {
+    const { boardPositions } = this.state;
     return (
       <View
         style={styles.board}
         onLayout={e => this.getYPosition(e)}
         {...this.panResponder.panHandlers}
       >
-        {[...Array(15)].map((yv, rowI) => (
+        {boardPositions.map((row, rowI) => (
           <View style={styles.row} key={rowI}>
-            {[...Array(15)].map((xv, colI) => (
+            {row.map((col, colI) => (
               <View
                 key={rowI + colI}
                 style={{
@@ -113,7 +126,8 @@ export default class Board extends React.Component<undefined, State> {
                     height: tileSize
                   }}
                 />
-                {/* <Image
+                {col && (
+                  <Image
                     source={ImageCross}
                     style={{
                       width: tileSize,
@@ -121,6 +135,8 @@ export default class Board extends React.Component<undefined, State> {
                       position: "absolute"
                     }}
                   />
+                )}
+                {col === false && (
                   <Image
                     source={ImageCircle}
                     style={{
@@ -128,7 +144,8 @@ export default class Board extends React.Component<undefined, State> {
                       height: tileSize,
                       position: "absolute"
                     }}
-                  /> */}
+                  />
+                )}
               </View>
             ))}
           </View>
