@@ -102,54 +102,57 @@ export default class Board extends React.Component<undefined, State> {
     return ImageTile;
   }
 
+  renderBoardPositions() {
+    return this.state.boardPositions.map((row, rowI) => (
+      <View style={styles.row} key={rowI}>
+        {row.map((col, colI) => (
+          <View
+            key={rowI + colI}
+            style={{
+              position: "relative"
+            }}
+          >
+            <Image
+              source={this.getTile(rowI, colI)}
+              style={{
+                width: tileSize,
+                height: tileSize
+              }}
+            />
+            {col && (
+              <Image
+                source={ImageCross}
+                style={{
+                  width: tileSize,
+                  height: tileSize,
+                  position: "absolute"
+                }}
+              />
+            )}
+            {col === false && (
+              <Image
+                source={ImageCircle}
+                style={{
+                  width: tileSize,
+                  height: tileSize,
+                  position: "absolute"
+                }}
+              />
+            )}
+          </View>
+        ))}
+      </View>
+    ));
+  }
+
   render() {
-    const { boardPositions } = this.state;
     return (
       <View
         style={styles.board}
         onLayout={e => this.getYPosition(e)}
         {...this.panResponder.panHandlers}
       >
-        {boardPositions.map((row, rowI) => (
-          <View style={styles.row} key={rowI}>
-            {row.map((col, colI) => (
-              <View
-                key={rowI + colI}
-                style={{
-                  position: "relative"
-                }}
-              >
-                <Image
-                  source={this.getTile(rowI, colI)}
-                  style={{
-                    width: tileSize,
-                    height: tileSize
-                  }}
-                />
-                {col && (
-                  <Image
-                    source={ImageCross}
-                    style={{
-                      width: tileSize,
-                      height: tileSize,
-                      position: "absolute"
-                    }}
-                  />
-                )}
-                {col === false && (
-                  <Image
-                    source={ImageCircle}
-                    style={{
-                      width: tileSize,
-                      height: tileSize,
-                      position: "absolute"
-                    }}
-                  />
-                )}
-              </View>
-            ))}
-          </View>
-        ))}
+        {this.renderBoardPositions()}
       </View>
     );
   }
