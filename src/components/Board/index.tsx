@@ -140,30 +140,50 @@ export default class Board extends React.Component<undefined, State> {
 
     // touch gesture logic
     this.panResponder = PanResponder.create({
+      // enable drag gestures
       onStartShouldSetPanResponder: (evt, gestureState) => true,
+      // on press gesture
       onPanResponderGrant: (evt, gestureState) => {
+        // get cursor coordinates
+        const cursorX = Math.trunc(gestureState.x0 / tileSize);
+        const cursorY = limitYVal(
+          Math.trunc((gestureState.y0 - this.state.boardPositionY) / tileSize)
+        );
+        const newBoardPositions = this.state.boardPositions.slice();
+        // cancel if tile is already occupied
+        if (newBoardPositions[cursorY][cursorX] !== undefined) {
+          return;
+        }
         this.setState({
           cursorActive: true,
-          cursorX: Math.trunc(gestureState.x0 / tileSize),
-          cursorY: limitYVal(
-            Math.trunc((gestureState.y0 - this.state.boardPositionY) / tileSize)
-          )
+          cursorX,
+          cursorY
         });
       },
       onPanResponderMove: (evt, gestureState) => {
-        this.setState({
-          cursorActive: true,
-          cursorX: Math.trunc(gestureState.moveX / tileSize),
-          cursorY: limitYVal(
-            Math.trunc(
-              (gestureState.moveY - this.state.boardPositionY) / tileSize
-            )
+        const cursorX = Math.trunc(gestureState.moveX / tileSize);
+        const cursorY = limitYVal(
+          Math.trunc(
+            (gestureState.moveY - this.state.boardPositionY) / tileSize
           )
+        );
+        const newBoardPositions = this.state.boardPositions.slice();
+        this.setState({
+          cursorActive: newBoardPositions[cursorY][cursorX] === undefined, // cancel if tile is already occupied
+          cursorX,
+          cursorY
         });
       },
       onPanResponderRelease: (evt, gestureState) => {
-        // place token at the position
         const newBoardPositions = this.state.boardPositions.slice();
+        // cancel if tile is already occupied
+        if (
+          newBoardPositions[this.state.cursorY][this.state.cursorX] !==
+          undefined
+        ) {
+          return;
+        }
+        // place token at the position
         newBoardPositions[this.state.cursorY][
           this.state.cursorX
         ] = this.state.isPlayerOne;
