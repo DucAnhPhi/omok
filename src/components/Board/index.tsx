@@ -124,6 +124,7 @@ const checkVictory = (token: boolean, positions: any[][]) => {
     }
   }
 };
+
 export default class Board extends React.Component<undefined, State> {
   panResponder: PanResponderInstance;
 

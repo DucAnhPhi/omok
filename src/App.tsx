@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import {
   Dimensions,
   Image,
@@ -14,7 +14,7 @@ const ImageCross = require("./assets/cross.png");
 const ImageTime = require("./assets/time.png");
 const ImageCircle = require("./assets/circle.png");
 
-export default class App extends Component {
+export default class App extends React.Component {
   render() {
     return (
       <View style={styles.container}>
