@@ -2,39 +2,38 @@ import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
 const ImageCross = require("./assets/cross.png");
-const ImageTime = require("./assets/time.png");
 const ImageCircle = require("./assets/circle.png");
 
 export default class PlayerStats extends React.Component {
   render() {
     return (
       <View style={styles.players}>
-        <View style={[styles.playerCard, { borderColor: "red" }]}>
+        <View style={[styles.playerCard, styles.activePlayer]}>
           <View style={styles.playerHeader}>
             <Text style={styles.playerName}>duc</Text>
           </View>
-          <View style={styles.playerStats}>
-            <View style={styles.playerType}>
-              <Image source={ImageCross} style={{ width: 20, height: 20 }} />
-            </View>
-            <View style={styles.playerTime}>
-              <Text style={{ color: "red", fontSize: 20 }}> 5:00</Text>
-              <Image source={ImageTime} style={{ width: 20, height: 20 }} />
-            </View>
+          <View style={styles.playerType}>
+            <Image source={ImageCross} style={{ width: 20, height: 20 }} />
+          </View>
+          <View style={styles.playerTime}>
+            <Text style={{ color: "black", fontSize: 20, fontWeight: "600" }}>
+              {" "}
+              5:00
+            </Text>
           </View>
         </View>
-        <View style={styles.playerCard}>
+        <View style={[styles.playerCard, false && styles.activePlayer]}>
           <View style={styles.playerHeader}>
             <Text style={styles.playerName}>david</Text>
           </View>
-          <View style={styles.playerStats}>
-            <View style={styles.playerType}>
-              <Image source={ImageCircle} style={{ width: 20, height: 20 }} />
-            </View>
-            <View style={styles.playerTime}>
-              <Text style={{ color: "black", fontSize: 20 }}> 5:00</Text>
-              <Image source={ImageTime} style={{ width: 20, height: 20 }} />
-            </View>
+          <View style={styles.playerType}>
+            <Image source={ImageCircle} style={{ width: 20, height: 20 }} />
+          </View>
+          <View style={styles.playerTime}>
+            <Text style={{ color: "black", fontSize: 20, fontWeight: "600" }}>
+              {" "}
+              5:00
+            </Text>
           </View>
         </View>
       </View>
@@ -44,42 +43,48 @@ export default class PlayerStats extends React.Component {
 
 const styles = StyleSheet.create({
   players: {
-    marginTop: 20,
+    margin: 10,
     flexDirection: "row",
-    width: 270,
     justifyContent: "space-between"
   },
   playerCard: {
-    borderWidth: 1,
-    width: 120,
-    borderRadius: 4,
-    borderColor: "black"
+    width: 145,
+    padding: 15,
+    opacity: 0.2,
+    marginHorizontal: 10,
+    position: "relative",
+    borderWidth: 2
   },
   playerHeader: {
     height: 25,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    borderBottomWidth: 1,
-    borderColor: "black"
+    justifyContent: "center"
   },
   playerName: {
     fontSize: 20,
+    fontWeight: "600",
     color: "black"
   },
-  playerStats: {
-    flexDirection: "row"
-  },
   playerType: {
-    flex: 0.3,
+    position: "absolute",
+    borderRightWidth: 2,
+    borderTopWidth: 2,
     alignItems: "center",
     justifyContent: "center",
-    borderRightWidth: 1
+    height: 40,
+    width: 40,
+    left: 0,
+    bottom: 0
   },
   playerTime: {
-    flex: 0.7,
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row"
+    marginTop: 8,
+    flexDirection: "row",
+    justifyContent: "center"
+  },
+  activePlayer: {
+    backgroundColor: "#f7f7f7",
+    borderWidth: 2,
+    opacity: 1
   }
 });

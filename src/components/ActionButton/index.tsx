@@ -18,14 +18,15 @@ export default function ActionButton(props: Props) {
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 4,
     width: 80,
-    height: 30,
+    height: 40,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "black"
+    backgroundColor: "#9f9f9f",
+    borderWidth: 2
   },
   buttonLabel: {
-    color: "white"
+    color: "white",
+    fontWeight: "600"
   }
 });

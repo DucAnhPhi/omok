@@ -272,8 +272,9 @@ export default class Board extends React.Component<undefined, State> {
 
 const styles = StyleSheet.create({
   board: {
-    flex: 1,
-    marginTop: 20
+    marginTop: 10,
+    borderTopWidth: 2,
+    borderBottomWidth: 2
   },
   row: {
     flexDirection: "row"
