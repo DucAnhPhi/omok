@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "42487874698",
+    "firebase_url": "https://omok-8943b.firebaseio.com",
+    "project_id": "omok-8943b",
+    "storage_bucket": "omok-8943b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:42487874698:android:e26fa06eb527c560",
+        "android_client_info": {
+          "package_name": "com.omok"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "42487874698-pmo4ki8utrlvuqqhe1s8nojglcg1je9k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.omok",
+            "certificate_hash": "845bed6f16cbdaeae4b7f77be9dbbe716714be77"
+          }
+        },
+        {
+          "client_id": "42487874698-4dqo5gsr8a4stt06cb6hquv4o8qfpnhj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBumm1THmLq7-9S4-m-bTEiqKHWAcAhjJY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "42487874698-4dqo5gsr8a4stt06cb6hquv4o8qfpnhj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
