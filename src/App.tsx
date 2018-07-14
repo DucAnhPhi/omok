@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import ActionButton from "./components/ActionButton";
 import Board from "./components/Board";
 import PlayerStats from "./components/PlayerStats";
@@ -39,7 +32,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: "center",
     color: "black",
-    fontWeight: "600"
+    fontWeight: "300"
   },
   actionButtons: {
     marginTop: 20,

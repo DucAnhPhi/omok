@@ -10,30 +10,24 @@ export default class PlayerStats extends React.Component {
       <View style={styles.players}>
         <View style={[styles.playerCard, styles.activePlayer]}>
           <View style={styles.playerHeader}>
-            <Text style={styles.playerName}>duc</Text>
+            <Text style={styles.playerName}>DUC</Text>
           </View>
           <View style={styles.playerType}>
             <Image source={ImageCross} style={{ width: 20, height: 20 }} />
           </View>
           <View style={styles.playerTime}>
-            <Text style={{ color: "black", fontSize: 20, fontWeight: "600" }}>
-              {" "}
-              5:00
-            </Text>
+            <Text style={{ color: "#555555", fontSize: 20 }}> 5:00</Text>
           </View>
         </View>
         <View style={[styles.playerCard, false && styles.activePlayer]}>
           <View style={styles.playerHeader}>
-            <Text style={styles.playerName}>david</Text>
+            <Text style={styles.playerName}>DAVID</Text>
           </View>
           <View style={styles.playerType}>
             <Image source={ImageCircle} style={{ width: 20, height: 20 }} />
           </View>
           <View style={styles.playerTime}>
-            <Text style={{ color: "black", fontSize: 20, fontWeight: "600" }}>
-              {" "}
-              5:00
-            </Text>
+            <Text style={{ color: "#555555", fontSize: 20 }}> 5:00</Text>
           </View>
         </View>
       </View>
