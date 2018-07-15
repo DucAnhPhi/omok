@@ -1,19 +1,10 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import firebase from "react-native-firebase";
 import ActionButton from "./components/ActionButton";
 import Board from "./components/Board";
 import PlayerStats from "./components/PlayerStats";
 
 export default class App extends React.Component {
-  componentDidMount() {
-    firebase
-      .auth()
-      .signInAnonymouslyAndRetrieveData()
-      .then(() => {
-        console.log("logged in");
-      });
-  }
   render() {
     return (
       <View style={styles.container}>
