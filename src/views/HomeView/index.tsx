@@ -16,6 +16,11 @@ export default class HomeView extends React.Component<Props> {
         <TouchableOpacity
           onPress={() => this.props.navigation.navigate("GameView")}
         >
+          <Text>PLAY ONLINE</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => this.props.navigation.navigate("GameView")}
+        >
           <Text>2 PLAYERS OFFLINE</Text>
         </TouchableOpacity>
       </View>
