@@ -4,7 +4,7 @@ import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
 
-export default class App extends React.Component {
+export default class GameView extends React.Component {
   render() {
     return (
       <View style={styles.container}>
