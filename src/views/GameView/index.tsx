@@ -1,14 +1,22 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import ActionButton from "../../components/ActionButton";
+import BackButton from "../../components/BackButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
 
 export default class GameView extends React.Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: "2 PLAYERS OFFLINE",
+      headerLeft: <BackButton navigation={navigation} />,
+      headerStyle: { elevation: 0 }
+    };
+  };
+
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.notification}>2 PLAYERS OFFLINE</Text>
         <PlayerStats />
         <Board />
         <View style={styles.actionButtons}>
@@ -26,13 +34,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     flex: 1
-  },
-  notification: {
-    marginTop: 15,
-    fontSize: 20,
-    textAlign: "center",
-    color: "black",
-    fontWeight: "300"
   },
   actionButtons: {
     marginTop: 20,

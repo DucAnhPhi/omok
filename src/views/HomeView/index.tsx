@@ -6,6 +6,9 @@ interface Props {
 }
 
 export default class HomeView extends React.Component<Props> {
+  static navigationOptions = {
+    header: null
+  };
   render() {
     return (
       <View>
