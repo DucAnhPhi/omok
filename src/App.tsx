@@ -1,23 +1,15 @@
-import React from "react";
-import firebase from "react-native-firebase";
-import { Provider } from "react-redux";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import { Navigation } from "react-native-navigation";
 import { persistStore } from "redux-persist";
-import AppStartup from "./AppStartup";
 import { store } from "./store";
-import { RootStack } from "./views/navigation";
+import { registerViews } from "./views/navigation";
 
 persistStore(store);
+registerViews();
 
-export default class App extends React.Component {
-  render() {
-    return (
-      <Provider store={store}>
-        <AppStartup>
-          <RootStack />
-        </AppStartup>
-      </Provider>
-    );
+// start the app
+Navigation.startSingleScreenApp({
+  screen: {
+    screen: "omok.HomeView",
+    title: "Welcome"
   }
-}
+});

@@ -1,12 +1,9 @@
 package com.omok;
 
-import android.support.multidex.MultiDexApplication;
-
-import com.facebook.react.ReactApplication;
-import com.facebook.react.ReactNativeHost;
+import android.support.multidex.MultiDex;
+import android.content.Context;
+import com.reactnativenavigation.NavigationApplication;
 import com.facebook.react.ReactPackage;
-import com.facebook.react.shell.MainReactPackage;
-import com.facebook.soloader.SoLoader;
 // firebase dependencies
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
@@ -16,39 +13,35 @@ import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainApplication extends MultiDexApplication implements ReactApplication {
-
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-    @Override
-    public boolean getUseDeveloperSupport() {
-      return BuildConfig.DEBUG;
-    }
-
-    @Override
-    protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-          new RNFirebasePackage(),
-          new RNFirebaseAuthPackage(),
-          new RNFirebaseFunctionsPackage(),
-          new RNFirebaseFirestorePackage()
-      );
-    }
-
-    @Override
-    protected String getJSMainModuleName() {
-      return "index";
-    }
-  };
-
+public class MainApplication extends NavigationApplication {
   @Override
-  public ReactNativeHost getReactNativeHost() {
-    return mReactNativeHost;
+  protected void attachBaseContext(Context base) {
+     super.attachBaseContext(base);
+     MultiDex.install(this);
   }
 
   @Override
-  public void onCreate() {
-    super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
+  public boolean isDebug() {
+      // Make sure you are using BuildConfig from your own application
+      return BuildConfig.DEBUG;
+  }
+
+  protected List<ReactPackage> getPackages() {
+    return Arrays.<ReactPackage>asList(
+      new RNFirebasePackage(),
+      new RNFirebaseAuthPackage(),
+      new RNFirebaseFunctionsPackage(),
+      new RNFirebaseFirestorePackage()
+    );
+  }
+
+  @Override
+  public List<ReactPackage> createAdditionalReactPackages() {
+      return getPackages();
+  }
+
+  @Override
+  public String getJSMainModuleName() {
+      return "index";
   }
 }
