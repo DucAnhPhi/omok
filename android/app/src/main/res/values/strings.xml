@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">omok</string>
+    <string name="facebook_app_id">530866730663264</string>
+    <string name="fb_login_protocol_scheme">fb530866730663264</string>
 </resources>

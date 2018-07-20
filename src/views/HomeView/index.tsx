@@ -1,5 +1,6 @@
 import React from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { LoginButton } from "react-native-fbsdk";
 import firebase from "react-native-firebase";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -21,12 +22,12 @@ class HomeView extends React.Component<Props> {
     header: null
   };
 
-  async componentDidMount() {
-    const currentUser = await Backend.loginAsGuest();
-    if (currentUser) {
-      this.props.loginSuccess();
-    }
-  }
+  // async componentDidMount() {
+  //   const currentUser = await Backend.loginAsGuest();
+  //   if (currentUser) {
+  //     this.props.loginSuccess();
+  //   }
+  // }
 
   async routingAction() {
     const { navigator } = this.props;
@@ -81,6 +82,21 @@ class HomeView extends React.Component<Props> {
     return (
       <View>
         <Text>Home</Text>
+        <LoginButton
+          onLoginFinished={(error, result) => {
+            if (error) {
+              alert("Login failed with error: " + error.message);
+            } else if (result.isCancelled) {
+              alert("Login was cancelled");
+            } else {
+              alert(
+                "Login was successful with permissions: " +
+                  result.grantedPermissions
+              );
+            }
+          }}
+          onLogoutFinished={() => alert("User logged out")}
+        />
         <TouchableOpacity
           onPress={() => {
             this.routingAction();

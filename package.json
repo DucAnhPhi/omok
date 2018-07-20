@@ -9,8 +9,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "@types/react-native-fbsdk": "^0.6.1",
     "react": "16.3.1",
     "react-native": "0.55.4",
+    "react-native-fbsdk": "^0.7.0",
     "react-native-firebase": "^4.3.7",
     "react-native-navigation": "^1.1.476",
     "react-redux": "^5.0.7",
