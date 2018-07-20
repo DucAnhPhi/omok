@@ -3,6 +3,7 @@ interface InitialState {
 }
 
 const USER_AUTHED = "USER_AUTHED";
+const USER_UNAUTHED = "USER_UNAUTHED";
 
 // REDUCER
 export const authReducer = (
@@ -12,6 +13,8 @@ export const authReducer = (
   switch (action.type) {
     case USER_AUTHED:
       return { authenticated: true };
+    case USER_UNAUTHED:
+      return { authenticated: false };
     default:
       return state;
   }
@@ -21,5 +24,11 @@ export const authReducer = (
 export const loginSuccess = () => {
   return (dispatch: any) => {
     dispatch({ type: USER_AUTHED });
+  };
+};
+
+export const logoutSuccess = () => {
+  return (dispatch: any) => {
+    dispatch({ type: USER_UNAUTHED });
   };
 };

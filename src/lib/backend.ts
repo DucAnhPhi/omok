@@ -1,9 +1,10 @@
 import firebase, { RNFirebase } from "react-native-firebase";
 const db = firebase.firestore();
+import { IProfile } from "../models";
 import Logger from "./logger";
 
 export default class Backend {
-  static getCurrentUser(): Promise<void | RNFirebase.firestore.DocumentSnapshot> {
+  static getCurrentProfile(): Promise<void | RNFirebase.firestore.DocumentSnapshot> {
     return db
       .collection("profiles")
       .doc(firebase.auth().currentUser.uid)
@@ -16,21 +17,17 @@ export default class Backend {
       });
   }
 
-  static createUser(
-    username: string
-  ): Promise<void | RNFirebase.functions.HttpsCallableResult> {
-    const httpsCallable = firebase.functions().httpsCallable("updateProfile");
+  static createProfile(username: string): Promise<void | IProfile> {
+    const httpsCallable = firebase.functions().httpsCallable("createProfile");
 
     return httpsCallable({ username })
-      .then(doc => {
-        return doc;
-      })
+      .then(({ data }): IProfile => data)
       .catch(e => {
         Logger.error("create user failed", e);
       });
   }
 
-  static signInAsGuest(): Promise<void | RNFirebase.UserCredential> {
+  static loginAsGuest(): Promise<void | RNFirebase.UserCredential> {
     return firebase
       .auth()
       .signInAnonymouslyAndRetrieveData()
@@ -38,5 +35,9 @@ export default class Backend {
       .catch(e => {
         Logger.error("sign in as guest failed", e);
       });
+  }
+
+  static logout(): Promise<void> {
+    return firebase.auth().signOut();
   }
 }
