@@ -1,19 +1,16 @@
 import React from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
-import { LoginButton } from "react-native-fbsdk";
-import firebase from "react-native-firebase";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import Backend from "../../lib/backend";
 import Logger from "../../lib/logger";
-import { loginSuccess, logoutSuccess } from "../../store/auth";
-import { clearProfile, updateProfile } from "../../store/profile";
+import { IProfile } from "../../models";
+import { clearProfile } from "../../store/profile";
 
 interface Props {
   navigator: any;
-  loginSuccess: () => void;
-  logoutSuccess: () => void;
-  updateProfile: (profile: any) => void;
+  profile: IProfile;
+  authenticated: boolean;
   clearProfile: () => void;
 }
 
@@ -22,22 +19,12 @@ class HomeView extends React.Component<Props> {
     header: null
   };
 
-  // async componentDidMount() {
-  //   const currentUser = await Backend.loginAsGuest();
-  //   if (currentUser) {
-  //     this.props.loginSuccess();
-  //   }
-  // }
-
   async routingAction() {
-    const { navigator } = this.props;
-    const currentUser = firebase.auth().currentUser;
-    if (currentUser) {
+    const { navigator, profile, authenticated } = this.props;
+    if (authenticated) {
       // if user is authenticated...
-      const currentProfile = await Backend.getCurrentProfile();
-      if (currentProfile && currentProfile.exists) {
-        // ... and profile for authenticated user exists
-        this.props.updateProfile(currentProfile.data());
+      if (profile) {
+        // if profile was persisted in redux
         navigator.push({
           screen: "omok.GameView",
           title: "ONLINE",
@@ -65,7 +52,6 @@ class HomeView extends React.Component<Props> {
         text: "ok",
         onPress: () => {
           Backend.logout().then(() => {
-            this.props.logoutSuccess();
             this.props.clearProfile();
           });
         }
@@ -82,21 +68,6 @@ class HomeView extends React.Component<Props> {
     return (
       <View>
         <Text>Home</Text>
-        <LoginButton
-          onLoginFinished={(error, result) => {
-            if (error) {
-              alert("Login failed with error: " + error.message);
-            } else if (result.isCancelled) {
-              alert("Login was cancelled");
-            } else {
-              alert(
-                "Login was successful with permissions: " +
-                  result.grantedPermissions
-              );
-            }
-          }}
-          onLogoutFinished={() => alert("User logged out")}
-        />
         <TouchableOpacity
           onPress={() => {
             this.routingAction();
@@ -127,13 +98,15 @@ class HomeView extends React.Component<Props> {
   }
 }
 
+const mapStateToProps = (state: any) => ({
+  profile: state.profileReducer.profile,
+  authenticated: state.authReducer.authenticated
+});
+
 const mapDispatchToProps = (dispatch: any) =>
-  bindActionCreators(
-    { loginSuccess, logoutSuccess, updateProfile, clearProfile },
-    dispatch
-  );
+  bindActionCreators({ clearProfile }, dispatch);
 
 export default connect(
-  undefined,
+  mapStateToProps,
   mapDispatchToProps
 )(HomeView);

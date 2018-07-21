@@ -1,7 +1,9 @@
+import { AccessToken, LoginManager } from "react-native-fbsdk";
 import firebase, { RNFirebase } from "react-native-firebase";
-const db = firebase.firestore();
 import { IProfile } from "../models";
 import Logger from "./logger";
+
+const db = firebase.firestore();
 
 export default class Backend {
   static getCurrentProfile(): Promise<void | RNFirebase.firestore.DocumentSnapshot> {
@@ -37,7 +39,40 @@ export default class Backend {
       });
   }
 
+  static async loginFB(
+    error,
+    result
+  ): Promise<void | RNFirebase.UserCredential> {
+    if (error) {
+      Logger.error("Login failed with error: ", error);
+      return Promise.reject();
+    } else if (result.isCancelled) {
+      Logger.info("Login was cancelled", "");
+      return Promise.reject();
+    } else {
+      try {
+        // get the access token
+        const data = await AccessToken.getCurrentAccessToken();
+
+        // create a new firebase credential with the token
+        const credential = firebase.auth.FacebookAuthProvider.credential(
+          data.accessToken
+        );
+
+        // login with credential
+        return firebase
+          .auth()
+          .signInAndRetrieveDataWithCredential(credential)
+          .then(userSnap => userSnap);
+      } catch (e) {
+        Logger.error("Cannot get FB access token", e);
+        return Promise.reject();
+      }
+    }
+  }
+
   static logout(): Promise<void> {
+    LoginManager.logOut();
     return firebase.auth().signOut();
   }
 }
