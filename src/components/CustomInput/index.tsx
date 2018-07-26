@@ -23,7 +23,7 @@ const CustomInput = (props: TextInputProps) => {
 
 const styles = StyleSheet.create({
   textInput: {
-    width: "100%",
+    width: 320,
     height: 48,
     borderWidth: 1,
     borderRadius: 8,

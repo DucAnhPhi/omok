@@ -9,7 +9,7 @@ interface Props {
 export default function ActionButton(props: Props) {
   return (
     <TouchableOpacity
-      style={[styles.button, props.isRed && { backgroundColor: "#c0392b" }]}
+      style={[styles.button, props.isRed && { backgroundColor: "#F1828D" }]}
     >
       <Text style={styles.buttonLabel}>{props.label.toUpperCase()}</Text>
     </TouchableOpacity>
@@ -22,11 +22,11 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#9f9f9f",
-    borderWidth: 2
+    backgroundColor: "#FCD0BA",
+    borderRadius: 5
   },
   buttonLabel: {
-    color: "white",
+    color: "black",
     fontWeight: "600"
   }
 });

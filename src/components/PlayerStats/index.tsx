@@ -47,7 +47,8 @@ const styles = StyleSheet.create({
     opacity: 0.2,
     marginHorizontal: 10,
     position: "relative",
-    borderWidth: 2
+    borderWidth: 2,
+    borderRadius: 5
   },
   playerHeader: {
     height: 25,
@@ -64,6 +65,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     borderRightWidth: 2,
     borderTopWidth: 2,
+    borderTopRightRadius: 5,
     alignItems: "center",
     justifyContent: "center",
     height: 40,

@@ -12,7 +12,8 @@ import firebase from "react-native-firebase";
 import Backend from "../../lib/backend";
 
 const ImageTile = require("./assets/tile.png");
-const ImageTileActive = require("./assets/tile_active.png");
+const ImageTileActive = require("./assets/tile-active.png");
+const ImageTileFocus = require("./assets/tile-focus.png");
 const ImageCross = require("./assets/cross.png");
 const ImageCircle = require("./assets/circle.png");
 
@@ -167,6 +168,9 @@ export default class OnlineBoard extends React.Component<undefined, State> {
   getTile(row, col) {
     if (this.state.cursorActive) {
       if (row === this.state.cursorY || col === this.state.cursorX) {
+        if (row === this.state.cursorY && col === this.state.cursorX) {
+          return ImageTileFocus;
+        }
         return ImageTileActive;
       }
     }
@@ -231,9 +235,7 @@ export default class OnlineBoard extends React.Component<undefined, State> {
 
 const styles = StyleSheet.create({
   board: {
-    marginTop: 10,
-    borderTopWidth: 2,
-    borderBottomWidth: 2
+    marginTop: 10
   },
   row: {
     flexDirection: "row"

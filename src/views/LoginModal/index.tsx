@@ -43,6 +43,7 @@ class LoginModal extends React.Component<Props> {
         });
       } else {
         // if profile for authenticated user does NOT exists
+        navigator.dismissAllModals();
         navigator.showModal({
           screen: "omok.CreateProfileModal",
           animationType: "screen"
@@ -54,19 +55,19 @@ class LoginModal extends React.Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Login</Text>
-        <TouchableOpacity
-          onPress={() => {
-            this.loginAsGuest();
-          }}
-        >
-          <Text>Login as a guest</Text>
-        </TouchableOpacity>
         <LoginButton
           onLoginFinished={(error, result) => {
             this.loginWithFB(error, result);
           }}
         />
+        <TouchableOpacity
+          onPress={() => {
+            this.loginAsGuest();
+          }}
+          style={{ marginTop: 20 }}
+        >
+          <Text>Login as a guest</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -75,7 +76,9 @@ class LoginModal extends React.Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white"
+    backgroundColor: "#FEFAD4",
+    alignItems: "center",
+    justifyContent: "center"
   }
 });
 

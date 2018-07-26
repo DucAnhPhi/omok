@@ -1,6 +1,5 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import firebase from "react-native-firebase";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import CustomInput from "../../components/CustomInput";
@@ -44,20 +43,20 @@ class CreateProfileModal extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Choose a username</Text>
         <CustomInput
           onChangeText={(username: string) => {
             this.setState({ username });
           }}
           value={this.state.username}
-          placeholder={"Enter you username (max. 10 characters)"}
+          placeholder={"Choose your username (max. 10 characters)"}
         />
         <TouchableOpacity
           onPress={() => {
             this.createProfile();
           }}
+          style={styles.button}
         >
-          <Text>submit</Text>
+          <Text style={styles.buttonLabel}>SUBMIT</Text>
         </TouchableOpacity>
       </View>
     );
@@ -67,7 +66,23 @@ class CreateProfileModal extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white"
+    backgroundColor: "#FEFAD4",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  button: {
+    margin: 10,
+    height: 50,
+    width: 200,
+    borderRadius: 5,
+    backgroundColor: "#8FB9A8",
+    justifyContent: "center"
+  },
+  buttonLabel: {
+    color: "black",
+    fontWeight: "600",
+    fontSize: 20,
+    textAlign: "center"
   }
 });
 

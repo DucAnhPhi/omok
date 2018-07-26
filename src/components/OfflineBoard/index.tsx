@@ -272,9 +272,7 @@ export default class OfflineBoard extends React.Component<undefined, State> {
 
 const styles = StyleSheet.create({
   board: {
-    marginTop: 10,
-    borderTopWidth: 2,
-    borderBottomWidth: 2
+    marginTop: 10
   },
   row: {
     flexDirection: "row"
