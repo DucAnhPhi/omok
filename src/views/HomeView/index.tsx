@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import Backend from "../../lib/backend";
@@ -15,8 +15,8 @@ interface Props {
 }
 
 class HomeView extends React.Component<Props> {
-  static navigationOptions = {
-    header: null
+  static navigatorStyle = {
+    navBarHidden: true
   };
 
   async routingAction() {
@@ -66,14 +66,14 @@ class HomeView extends React.Component<Props> {
 
   render() {
     return (
-      <View>
-        <Text>Home</Text>
+      <View style={styles.home}>
         <TouchableOpacity
           onPress={() => {
             this.routingAction();
           }}
+          style={[styles.button, { backgroundColor: "#8FB9A8" }]}
         >
-          <Text>PLAY ONLINE</Text>
+          <Text style={styles.buttonLabel}>PLAY ONLINE</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() =>
@@ -83,13 +83,15 @@ class HomeView extends React.Component<Props> {
               animated: true
             })
           }
+          style={[styles.button, { backgroundColor: "#765D69" }]}
         >
-          <Text>2 PLAYERS OFFLINE</Text>
+          <Text style={styles.buttonLabel}>2 PLAYERS OFFLINE</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             this.logout();
           }}
+          style={{ marginTop: 20 }}
         >
           <Text>LOGOUT</Text>
         </TouchableOpacity>
@@ -97,6 +99,30 @@ class HomeView extends React.Component<Props> {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  home: {
+    flex: 1,
+    backgroundColor: "#FEFAD4",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  button: {
+    width: 300,
+    height: 50,
+    margin: 15,
+    borderWidth: 0,
+    borderColor: "black",
+    borderRadius: 5,
+    justifyContent: "center"
+  },
+  buttonLabel: {
+    fontSize: 20,
+    color: "black",
+    textAlign: "center",
+    fontWeight: "600"
+  }
+});
 
 const mapStateToProps = (state: any) => ({
   profile: state.profileReducer.profile,
