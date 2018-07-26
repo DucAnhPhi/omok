@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import ActionButton from "../../components/ActionButton";
 import BackButton from "../../components/BackButton";
-import Board from "../../components/Board";
+import OnlineBoard from "../../components/OnlineBoard";
 import PlayerStats from "../../components/PlayerStats";
 
 export default class GameView extends React.Component {
@@ -18,7 +18,7 @@ export default class GameView extends React.Component {
     return (
       <View style={styles.container}>
         <PlayerStats />
-        <Board />
+        <OnlineBoard />
         <View style={styles.actionButtons}>
           <ActionButton label={"redo"} />
           <ActionButton label={"draw"} />

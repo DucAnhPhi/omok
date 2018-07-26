@@ -1,6 +1,6 @@
 import { AccessToken, LoginManager } from "react-native-fbsdk";
 import firebase, { RNFirebase } from "react-native-firebase";
-import { IProfile } from "../models";
+import { IGame, IProfile } from "../models";
 import Logger from "./logger";
 
 const db = firebase.firestore();
@@ -75,4 +75,32 @@ export default class Backend {
     LoginManager.logOut();
     return firebase.auth().signOut();
   }
+
+  static findGame(): Promise<RNFirebase.firestore.QuerySnapshot> {
+    return db
+      .collection("games")
+      .where("available", "==", true)
+      .limit(1)
+      .get();
+  }
+
+  static createGame(): Promise<string> {
+    const httpsCallable = firebase.functions().httpsCallable("createGame");
+    return httpsCallable().then(() => firebase.auth().currentUser.uid);
+  }
+
+  static matchGame(gameId: string): Promise<string> {
+    const httpsCallable = firebase.functions().httpsCallable("matchGame");
+    return httpsCallable({ gameId }).then(() => gameId);
+  }
+
+  static makeMove(gameId: string, position: { x: number; y: number }) {
+    const httpsCallable = firebase.functions().httpsCallable("makeMove");
+    return httpsCallable({ gameId, position });
+  }
+
+  // static leaveGame(gameId: string): Promise<any> {
+  //   const httpsCallable = firebase.functions().httpsCallable("leaveGame");
+  //   return httpsCallable({ gameId });
+  // }
 }

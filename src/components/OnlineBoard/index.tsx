@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   Dimensions,
   Image,
   PanResponder,
@@ -7,6 +8,8 @@ import {
   StyleSheet,
   View
 } from "react-native";
+import firebase from "react-native-firebase";
+import Backend from "../../lib/backend";
 
 const ImageTile = require("./assets/tile.png");
 const ImageTileActive = require("./assets/tile_active.png");
@@ -22,7 +25,8 @@ interface State {
   boardPositionY: number;
   cursorActive: boolean;
   boardPositions: any[][];
-  isPlayerOne: boolean;
+  gameId: string;
+  playerWhite: string;
 }
 
 const limitYVal = yVal => {
@@ -35,98 +39,18 @@ const limitYVal = yVal => {
   return yVal;
 };
 
-const checkRow = (row, col, positions, currentToken) => {
-  let inALine = 0;
-  for (let colOffset = 1; colOffset < 5; colOffset++) {
-    if (positions[row][col + colOffset] === currentToken) {
-      inALine++;
-    } else {
-      break;
-    }
-  }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
+const convertToPositions = (moves: { [key: string]: boolean }) => {
+  const boardPositions = [...Array(15)].map(() => [...Array(15)]);
+  Object.keys(moves).map(move => {
+    const position = JSON.parse(move); // { x: number, y: number}
+    boardPositions[position.y][position.x] = moves[move];
+  });
+  return boardPositions;
 };
 
-const checkColumn = (row, col, positions, currentToken) => {
-  let inALine = 0;
-  for (let rowOffset = 1; rowOffset < 5; rowOffset++) {
-    if (positions[row + rowOffset][col] === currentToken) {
-      inALine++;
-    } else {
-      break;
-    }
-  }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
-};
-
-const checkDiagonalRight = (row, col, positions, currentToken) => {
-  let inALine = 0;
-  for (let offset = 1; offset < 5; offset++) {
-    if (positions[row + offset][col + offset] === currentToken) {
-      inALine++;
-    } else {
-      break;
-    }
-  }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
-};
-
-const checkDiagonalLeft = (row, col, positions, currentToken) => {
-  let inALine = 0;
-  for (let offset = 1; offset < 5; offset++) {
-    if (positions[row + offset][col - offset] === currentToken) {
-      inALine++;
-    } else {
-      break;
-    }
-  }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
-};
-
-const checkVictory = (token: boolean, positions: any[][]) => {
-  for (let row = 0; row < positions.length; row++) {
-    for (let col = 0; col < positions[row].length; col++) {
-      const currentToken = positions[row][col];
-      if (currentToken === undefined) {
-        continue;
-      }
-      const overBottomLimit = row + 4 > 14;
-      const overRightLimit = col + 4 > 14;
-      const overLeftLimit = col - 4 < 0;
-      // lookup the next 4 same tokens on the right if col + 4 <15
-      if (!overRightLimit) {
-        checkRow(row, col, positions, currentToken);
-      }
-      // lookup the next 4 same tokens south if row + 4 <15
-      if (!overBottomLimit) {
-        checkColumn(row, col, positions, currentToken);
-      }
-      // lookup the next 4 same tokens diagonally right if col+4<15 && row+4<15
-      if (!overRightLimit && !overBottomLimit) {
-        checkDiagonalRight(row, col, positions, currentToken);
-      }
-      // lookup the next 4 same tokens diagonally left if col-4 >=0 && row+4<15
-      if (!overLeftLimit && !overBottomLimit) {
-        checkDiagonalLeft(row, col, positions, currentToken);
-      }
-    }
-  }
-};
-
-export default class Board extends React.Component<undefined, State> {
+export default class OnlineBoard extends React.Component<undefined, State> {
   panResponder: PanResponderInstance;
+  unsubscribe: any;
 
   constructor() {
     super(undefined);
@@ -136,7 +60,8 @@ export default class Board extends React.Component<undefined, State> {
       boardPositionY: 0,
       cursorActive: false,
       boardPositions: [...Array(15)].map(() => [...Array(15)]),
-      isPlayerOne: true
+      gameId: null,
+      playerWhite: ""
     };
 
     // touch gesture logic
@@ -185,18 +110,52 @@ export default class Board extends React.Component<undefined, State> {
           return;
         }
         // place token at the position
-        newBoardPositions[this.state.cursorY][
-          this.state.cursorX
-        ] = this.state.isPlayerOne;
-        checkVictory(this.state.isPlayerOne, newBoardPositions);
+        Backend.makeMove(this.state.gameId, {
+          x: this.state.cursorX,
+          y: this.state.cursorY
+        });
         this.setState({
-          cursorActive: false,
-          boardPositions: newBoardPositions,
-          // change turn
-          isPlayerOne: !this.state.isPlayerOne
+          cursorActive: false
         });
       }
     });
+  }
+
+  async componentDidMount() {
+    const gameSnap = await Backend.findGame();
+    const gameDoc = gameSnap.docs[0];
+    let gameId;
+    if (gameDoc) {
+      gameId = await Backend.matchGame(gameDoc.id);
+      console.log("Game matched");
+    } else {
+      gameId = await Backend.createGame();
+      console.log("Game created");
+    }
+    this.setState({ gameId });
+    this.unsubscribe = firebase
+      .firestore()
+      .collection("games")
+      .doc(gameId)
+      .onSnapshot(doc => {
+        if (doc.exists) {
+          console.log("about to update the game state");
+          const game = doc.data() as any;
+          this.setState({
+            boardPositions: convertToPositions(game.moves),
+            playerWhite: game.playerWhite
+          });
+        }
+      });
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+    // if (this.state.gameId) {
+    //   Backend.leaveGame(this.state.gameId);
+    // }
   }
 
   getYPosition(e) {
