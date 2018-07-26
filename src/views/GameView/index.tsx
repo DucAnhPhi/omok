@@ -8,7 +8,8 @@ import PlayerStats from "../../components/PlayerStats";
 export default class GameView extends React.Component {
   static navigatorStyle = {
     navBarBackgroundColor: "#FEFAD4",
-    topBarElevationShadowEnabled: false
+    topBarElevationShadowEnabled: false,
+    navBarTitleTextCentered: true
   };
 
   render() {
