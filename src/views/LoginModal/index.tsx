@@ -37,7 +37,7 @@ class LoginModal extends React.Component<Props> {
         // if profile for authenticated user exists
         navigator.dismissAllModals();
         navigator.push({
-          screen: "omok.GameView",
+          screen: "omok.OnlineGameView",
           title: "ONLINE",
           animated: true
         });

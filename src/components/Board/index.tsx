@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   Dimensions,
   Image,
   PanResponder,
@@ -9,20 +10,23 @@ import {
 } from "react-native";
 
 const ImageTile = require("./assets/tile.png");
-const ImageTileActive = require("./assets/tile_active.png");
+const ImageTileActive = require("./assets/tile-active.png");
+const ImageTileFocus = require("./assets/tile-focus.png");
 const ImageCross = require("./assets/cross.png");
 const ImageCircle = require("./assets/circle.png");
 
 const screenWidth = Dimensions.get("window").width;
 const tileSize = screenWidth / 15;
 
+interface Props {
+  boardPositions: any[][];
+  makeMove: (position: { x: number; y: number }) => void;
+}
 interface State {
   cursorX: number;
   cursorY: number;
-  boardPositionY: number;
   cursorActive: boolean;
-  boardPositions: any[][];
-  isPlayerOne: boolean;
+  boardPositionY: number;
 }
 
 const limitYVal = yVal => {
@@ -35,108 +39,17 @@ const limitYVal = yVal => {
   return yVal;
 };
 
-const checkRow = (row, col, positions, currentToken) => {
-  let inALine = 0;
-  for (let colOffset = 1; colOffset < 5; colOffset++) {
-    if (positions[row][col + colOffset] === currentToken) {
-      inALine++;
-    } else {
-      break;
-    }
-  }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
-};
-
-const checkColumn = (row, col, positions, currentToken) => {
-  let inALine = 0;
-  for (let rowOffset = 1; rowOffset < 5; rowOffset++) {
-    if (positions[row + rowOffset][col] === currentToken) {
-      inALine++;
-    } else {
-      break;
-    }
-  }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
-};
-
-const checkDiagonalRight = (row, col, positions, currentToken) => {
-  let inALine = 0;
-  for (let offset = 1; offset < 5; offset++) {
-    if (positions[row + offset][col + offset] === currentToken) {
-      inALine++;
-    } else {
-      break;
-    }
-  }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
-};
-
-const checkDiagonalLeft = (row, col, positions, currentToken) => {
-  let inALine = 0;
-  for (let offset = 1; offset < 5; offset++) {
-    if (positions[row + offset][col - offset] === currentToken) {
-      inALine++;
-    } else {
-      break;
-    }
-  }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
-};
-
-const checkVictory = (token: boolean, positions: any[][]) => {
-  for (let row = 0; row < positions.length; row++) {
-    for (let col = 0; col < positions[row].length; col++) {
-      const currentToken = positions[row][col];
-      if (currentToken === undefined) {
-        continue;
-      }
-      const overBottomLimit = row + 4 > 14;
-      const overRightLimit = col + 4 > 14;
-      const overLeftLimit = col - 4 < 0;
-      // lookup the next 4 same tokens on the right if col + 4 <15
-      if (!overRightLimit) {
-        checkRow(row, col, positions, currentToken);
-      }
-      // lookup the next 4 same tokens south if row + 4 <15
-      if (!overBottomLimit) {
-        checkColumn(row, col, positions, currentToken);
-      }
-      // lookup the next 4 same tokens diagonally right if col+4<15 && row+4<15
-      if (!overRightLimit && !overBottomLimit) {
-        checkDiagonalRight(row, col, positions, currentToken);
-      }
-      // lookup the next 4 same tokens diagonally left if col-4 >=0 && row+4<15
-      if (!overLeftLimit && !overBottomLimit) {
-        checkDiagonalLeft(row, col, positions, currentToken);
-      }
-    }
-  }
-};
-
-export default class OfflineBoard extends React.Component<undefined, State> {
+export default class Board extends React.Component<Props, State> {
   panResponder: PanResponderInstance;
+  unsubscribe: any;
 
   constructor() {
     super(undefined);
     this.state = {
       cursorX: 0,
       cursorY: 0,
-      boardPositionY: 0,
       cursorActive: false,
-      boardPositions: [...Array(15)].map(() => [...Array(15)]),
-      isPlayerOne: true
+      boardPositionY: 0
     };
 
     // touch gesture logic
@@ -150,7 +63,7 @@ export default class OfflineBoard extends React.Component<undefined, State> {
         const cursorY = limitYVal(
           Math.trunc((gestureState.y0 - this.state.boardPositionY) / tileSize)
         );
-        const newBoardPositions = this.state.boardPositions.slice();
+        const newBoardPositions = this.props.boardPositions.slice();
         // cancel if tile is already occupied
         if (newBoardPositions[cursorY][cursorX] !== undefined) {
           return;
@@ -168,7 +81,7 @@ export default class OfflineBoard extends React.Component<undefined, State> {
             (gestureState.moveY - this.state.boardPositionY) / tileSize
           )
         );
-        const newBoardPositions = this.state.boardPositions.slice();
+        const newBoardPositions = this.props.boardPositions.slice();
         this.setState({
           cursorActive: newBoardPositions[cursorY][cursorX] === undefined, // cancel if tile is already occupied
           cursorX,
@@ -176,7 +89,7 @@ export default class OfflineBoard extends React.Component<undefined, State> {
         });
       },
       onPanResponderRelease: (evt, gestureState) => {
-        const newBoardPositions = this.state.boardPositions.slice();
+        const newBoardPositions = this.props.boardPositions.slice();
         // cancel if tile is already occupied
         if (
           newBoardPositions[this.state.cursorY][this.state.cursorX] !==
@@ -185,18 +98,21 @@ export default class OfflineBoard extends React.Component<undefined, State> {
           return;
         }
         // place token at the position
-        newBoardPositions[this.state.cursorY][
-          this.state.cursorX
-        ] = this.state.isPlayerOne;
-        checkVictory(this.state.isPlayerOne, newBoardPositions);
+        this.props.makeMove({ x: this.state.cursorX, y: this.state.cursorY });
         this.setState({
-          cursorActive: false,
-          boardPositions: newBoardPositions,
-          // change turn
-          isPlayerOne: !this.state.isPlayerOne
+          cursorActive: false
         });
       }
     });
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+    // if (this.state.gameId) {
+    //   Backend.leaveGame(this.state.gameId);
+    // }
   }
 
   getYPosition(e) {
@@ -208,6 +124,9 @@ export default class OfflineBoard extends React.Component<undefined, State> {
   getTile(row, col) {
     if (this.state.cursorActive) {
       if (row === this.state.cursorY || col === this.state.cursorX) {
+        if (row === this.state.cursorY && col === this.state.cursorX) {
+          return ImageTileFocus;
+        }
         return ImageTileActive;
       }
     }
@@ -215,7 +134,7 @@ export default class OfflineBoard extends React.Component<undefined, State> {
   }
 
   renderBoardPositions() {
-    return this.state.boardPositions.map((row, rowI) => (
+    return this.props.boardPositions.map((row, rowI) => (
       <View style={styles.row} key={rowI}>
         {row.map((col, colI) => (
           <View

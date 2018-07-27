@@ -26,7 +26,7 @@ class HomeView extends React.Component<Props> {
       if (profile) {
         // if profile was persisted in redux
         navigator.push({
-          screen: "omok.GameView",
+          screen: "omok.OnlineGameView",
           title: "ONLINE",
           animated: true
         });
@@ -78,7 +78,7 @@ class HomeView extends React.Component<Props> {
         <TouchableOpacity
           onPress={() =>
             this.props.navigator.push({
-              screen: "omok.GameView",
+              screen: "omok.OfflineGameView",
               title: "2 PLAYERS OFFLINE",
               animated: true
             })
@@ -111,8 +111,6 @@ const styles = StyleSheet.create({
     width: 300,
     height: 50,
     margin: 15,
-    borderWidth: 0,
-    borderColor: "black",
     borderRadius: 5,
     justifyContent: "center"
   },
