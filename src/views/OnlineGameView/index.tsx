@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import firebase from "react-native-firebase";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
@@ -12,6 +12,7 @@ interface State {
   playerWhite: string;
   loading: boolean;
   loadingMessage: string;
+  winner: string;
 }
 
 const convertToPositions = (moves: { [key: string]: boolean }) => {
@@ -39,7 +40,8 @@ export default class OnlineGameView extends React.Component<undefined, State> {
       boardPositions: [...Array(15)].map(() => [...Array(15)]),
       gameId: null,
       playerWhite: null,
-      loadingMessage: null
+      loadingMessage: null,
+      winner: null
     };
   }
 
@@ -73,9 +75,14 @@ export default class OnlineGameView extends React.Component<undefined, State> {
         if (doc.exists) {
           console.log("about to update the game state");
           const game = doc.data() as any;
+          if (game.winner) {
+            alert(`winner is ${game.winner}`);
+          }
           this.setState({
+            loading: game.playerIds.length !== 2,
             boardPositions: convertToPositions(game.moves),
-            playerWhite: game.playerWhite
+            playerWhite: game.playerWhite,
+            winner: game.winner
           });
         }
       });
