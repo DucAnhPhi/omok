@@ -87,14 +87,16 @@ class HomeView extends React.Component<Props> {
         >
           <Text style={styles.buttonLabel}>2 PLAYERS OFFLINE</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            this.logout();
-          }}
-          style={{ marginTop: 20 }}
-        >
-          <Text>LOGOUT</Text>
-        </TouchableOpacity>
+        {this.props.authenticated && (
+          <TouchableOpacity
+            onPress={() => {
+              this.logout();
+            }}
+            style={{ marginTop: 20 }}
+          >
+            <Text>LOGOUT</Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   }
