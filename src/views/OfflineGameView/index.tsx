@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
@@ -18,10 +18,7 @@ const checkRow = (row, col, positions, currentToken) => {
       break;
     }
   }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
+  return inALine === 4;
 };
 
 const checkColumn = (row, col, positions, currentToken) => {
@@ -33,10 +30,7 @@ const checkColumn = (row, col, positions, currentToken) => {
       break;
     }
   }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
+  return inALine === 4;
 };
 
 const checkDiagonalRight = (row, col, positions, currentToken) => {
@@ -48,10 +42,7 @@ const checkDiagonalRight = (row, col, positions, currentToken) => {
       break;
     }
   }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
+  return inALine === 4;
 };
 
 const checkDiagonalLeft = (row, col, positions, currentToken) => {
@@ -63,10 +54,7 @@ const checkDiagonalLeft = (row, col, positions, currentToken) => {
       break;
     }
   }
-  if (inALine === 4) {
-    alert("win");
-    return true;
-  }
+  return inALine === 4;
 };
 
 const checkVictory = (token: boolean, positions: any[][]) => {
@@ -81,22 +69,31 @@ const checkVictory = (token: boolean, positions: any[][]) => {
       const overLeftLimit = col - 4 < 0;
       // lookup the next 4 same tokens on the right if col + 4 <15
       if (!overRightLimit) {
-        checkRow(row, col, positions, currentToken);
+        if (checkRow(row, col, positions, currentToken)) {
+          return true;
+        }
       }
       // lookup the next 4 same tokens south if row + 4 <15
       if (!overBottomLimit) {
-        checkColumn(row, col, positions, currentToken);
+        if (checkColumn(row, col, positions, currentToken)) {
+          return true;
+        }
       }
       // lookup the next 4 same tokens diagonally right if col+4<15 && row+4<15
       if (!overRightLimit && !overBottomLimit) {
-        checkDiagonalRight(row, col, positions, currentToken);
+        if (checkDiagonalRight(row, col, positions, currentToken)) {
+          return true;
+        }
       }
       // lookup the next 4 same tokens diagonally left if col-4 >=0 && row+4<15
       if (!overLeftLimit && !overBottomLimit) {
-        checkDiagonalLeft(row, col, positions, currentToken);
+        if (checkDiagonalLeft(row, col, positions, currentToken)) {
+          return true;
+        }
       }
     }
   }
+  return false;
 };
 
 export default class OfflineGameView extends React.Component<undefined, State> {
@@ -125,7 +122,13 @@ export default class OfflineGameView extends React.Component<undefined, State> {
       boardPositions: newBoardPositions,
       whiteTurn: !this.state.whiteTurn
     });
-    checkVictory(this.state.whiteTurn, this.state.boardPositions);
+    const isVictory = checkVictory(
+      this.state.whiteTurn,
+      this.state.boardPositions
+    );
+    if (isVictory) {
+      alert("win");
+    }
   };
 
   render() {
