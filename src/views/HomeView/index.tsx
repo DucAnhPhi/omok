@@ -92,11 +92,12 @@ class HomeView extends React.Component<Props> {
             onPress={() => {
               this.logout();
             }}
-            style={{ marginTop: 20 }}
+            style={{ marginTop: 20, height: 20 }}
           >
             <Text>LOGOUT</Text>
           </TouchableOpacity>
         )}
+        {!this.props.authenticated && <View style={styles.filler} />}
       </View>
     );
   }
@@ -121,6 +122,10 @@ const styles = StyleSheet.create({
     color: "black",
     textAlign: "center",
     fontWeight: "600"
+  },
+  filler: {
+    height: 20,
+    marginTop: 20
   }
 });
 

@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import CustomInput from "../../components/CustomInput";
@@ -13,6 +19,7 @@ interface Props {
 
 interface State {
   username: string;
+  loading: boolean;
 }
 
 class CreateProfileModal extends React.Component<Props, State> {
@@ -23,12 +30,15 @@ class CreateProfileModal extends React.Component<Props, State> {
   constructor() {
     super(undefined);
     this.state = {
-      username: ""
+      username: "",
+      loading: false
     };
   }
 
   async createProfile() {
+    this.setState({ loading: true });
     const newProfile = await Backend.createProfile(this.state.username);
+    this.setState({ loading: false });
     if (newProfile) {
       this.props.updateProfile(newProfile);
       this.props.navigator.dismissAllModals();
@@ -43,6 +53,11 @@ class CreateProfileModal extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
+        {this.state.loading && (
+          <View style={styles.loadingSpinner}>
+            <ActivityIndicator size={"large"} color={"#8FB9A8"} />
+          </View>
+        )}
         <CustomInput
           onChangeText={(username: string) => {
             this.setState({ username });
@@ -75,7 +90,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: 200,
     borderRadius: 5,
-    backgroundColor: "#8FB9A8",
+    backgroundColor: "#FCD0BA",
     justifyContent: "center"
   },
   buttonLabel: {
@@ -83,6 +98,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 20,
     textAlign: "center"
+  },
+  loadingSpinner: {
+    position: "absolute",
+    zIndex: 2
   }
 });
 

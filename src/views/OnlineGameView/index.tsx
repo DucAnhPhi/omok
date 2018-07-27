@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import firebase from "react-native-firebase";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
@@ -10,6 +10,8 @@ interface State {
   boardPositions: any[][];
   gameId: string;
   playerWhite: string;
+  loading: boolean;
+  loadingMessage: string;
 }
 
 const convertToPositions = (moves: { [key: string]: boolean }) => {
@@ -33,24 +35,33 @@ export default class OnlineGameView extends React.Component<undefined, State> {
   constructor() {
     super(undefined);
     this.state = {
+      loading: false,
       boardPositions: [...Array(15)].map(() => [...Array(15)]),
       gameId: null,
-      playerWhite: null
+      playerWhite: null,
+      loadingMessage: null
     };
   }
 
   async componentDidMount() {
-    // TODO: action find game
+    this.setState({
+      loading: true,
+      loadingMessage: "Looking for open game..."
+    });
     const gameSnap = await Backend.findGame();
     const gameDoc = gameSnap.docs[0];
     let gameId;
     if (gameDoc) {
+      this.setState({ loadingMessage: "Game found. Making match..." });
       gameId = await Backend.matchGame(gameDoc.id);
-      // TODO: action game found
+      this.setState({ loading: false });
       console.log("Game matched");
     } else {
+      this.setState({ loadingMessage: "No open game found. Creating game..." });
       gameId = await Backend.createGame();
-      // TODO: action game created
+      this.setState({
+        loadingMessage: "Game created. Waiting for opponent..."
+      });
       console.log("Game created");
     }
     this.setState({ gameId });
@@ -74,10 +85,22 @@ export default class OnlineGameView extends React.Component<undefined, State> {
     Backend.makeMove(this.state.gameId, position);
   };
 
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <PlayerStats />
+        {!this.state.loading && <PlayerStats />}
+        {this.state.loading && (
+          <View style={styles.loadingIndicator}>
+            <ActivityIndicator size={"large"} color={"#8FB9A8"} />
+            <Text>{this.state.loadingMessage}</Text>
+          </View>
+        )}
         <Board
           boardPositions={this.state.boardPositions}
           makeMove={this.makeMove}
@@ -103,5 +126,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: 270,
     justifyContent: "space-between"
+  },
+  loadingIndicator: {
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center"
   }
 });
