@@ -99,8 +99,8 @@ export default class Backend {
     return httpsCallable({ gameId, position });
   }
 
-  // static leaveGame(gameId: string): Promise<any> {
-  //   const httpsCallable = firebase.functions().httpsCallable("leaveGame");
-  //   return httpsCallable({ gameId });
-  // }
+  static leaveGame(gameId: string): Promise<any> {
+    const httpsCallable = firebase.functions().httpsCallable("leaveGame");
+    return httpsCallable({ gameId });
+  }
 }

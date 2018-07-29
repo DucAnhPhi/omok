@@ -9,6 +9,7 @@ import Backend from "../../lib/backend";
 interface State {
   boardPositions: any[][];
   gameId: string;
+  playerIds: { [key: string]: boolean };
   playerWhite: string;
   loading: boolean;
   loadingMessage: string;
@@ -56,7 +57,6 @@ export default class OnlineGameView extends React.Component<undefined, State> {
     if (gameDoc) {
       this.setState({ loadingMessage: "Game found. Making match..." });
       gameId = await Backend.matchGame(gameDoc.id);
-      this.setState({ loading: false });
       console.log("Game matched");
     } else {
       this.setState({ loadingMessage: "No open game found. Creating game..." });
@@ -73,14 +73,15 @@ export default class OnlineGameView extends React.Component<undefined, State> {
       .doc(gameId)
       .onSnapshot(doc => {
         if (doc.exists) {
-          console.log("about to update the game state");
           const game = doc.data() as any;
+          console.log(game.playerIds);
           if (game.winner) {
             alert(`winner is ${game.winner}`);
           }
           this.setState({
-            loading: game.playerIds.length !== 2,
+            loading: Object.keys(game.playerIds).length !== 2,
             boardPositions: convertToPositions(game.moves),
+            playerIds: game.playerIds,
             playerWhite: game.playerWhite,
             winner: game.winner
           });
@@ -95,6 +96,9 @@ export default class OnlineGameView extends React.Component<undefined, State> {
   componentWillUnmount() {
     if (this.unsubscribe) {
       this.unsubscribe();
+    }
+    if (this.state.gameId) {
+      Backend.leaveGame(this.state.gameId);
     }
   }
 
