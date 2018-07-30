@@ -8,19 +8,36 @@ import {
   View
 } from "react-native";
 
-export default class GameListView extends React.Component {
+interface Props {
+  navigator: any;
+}
+
+export default class GameListView extends React.Component<Props> {
   static navigatorStyle = {
     navBarBackgroundColor: "#FEFAD4",
     topBarElevationShadowEnabled: false,
     navBarTitleTextCentered: true
   };
 
+  createGame() {
+    this.props.navigator.push({
+      screen: "omok.OnlineGameView",
+      animated: true,
+      passProps: {
+        isCreating: true
+      }
+    });
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>OPEN GAMES</Text>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => this.createGame()}
+          >
             <Text style={styles.buttonLabel}>CREATE GAME</Text>
           </TouchableOpacity>
         </View>
@@ -51,7 +68,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FEFAD4"
   },
   header: {
-    marginVertical: 10,
+    marginTop: 10,
+    marginBottom: 20,
     flexDirection: "row",
     paddingHorizontal: 20
   },

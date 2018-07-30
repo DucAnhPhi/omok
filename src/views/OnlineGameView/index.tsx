@@ -1,11 +1,15 @@
 import React from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import firebase from "react-native-firebase";
+import SocketIOClient from "socket.io-client";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
 import Backend from "../../lib/backend";
 
+interface Props {
+  isCreating?: boolean;
+}
 interface State {
   boardPositions: any[][];
   gameId: string;
@@ -25,14 +29,14 @@ const convertToPositions = (moves: { [key: string]: boolean }) => {
   return boardPositions;
 };
 
-export default class OnlineGameView extends React.Component<undefined, State> {
+export default class OnlineGameView extends React.Component<Props, State> {
   static navigatorStyle = {
     navBarBackgroundColor: "#FEFAD4",
     topBarElevationShadowEnabled: false,
     navBarTitleTextCentered: true
   };
 
-  unsubscribe: any;
+  io: SocketIOClient.Socket;
 
   constructor() {
     super(undefined);
@@ -47,61 +51,23 @@ export default class OnlineGameView extends React.Component<undefined, State> {
     };
   }
 
-  async componentDidMount() {
-    this.setState({
-      loading: true,
-      loadingMessage: "Looking for open game..."
+  componentDidMount() {
+    this.io = SocketIOClient("http://192.168.178.51:3000");
+    this.io.emit("createGame", { userId: firebase.auth().currentUser.uid });
+    this.io.on("gameCreated", initialGame => {
+      console.log(initialGame);
     });
-    const gameSnap = await Backend.findGame();
-    const gameDoc = gameSnap.docs[0];
-    let gameId;
-    if (gameDoc) {
-      this.setState({ loadingMessage: "Game found. Making match..." });
-      gameId = await Backend.matchGame(gameDoc.id);
-      console.log("Game matched");
-    } else {
-      this.setState({ loadingMessage: "No open game found. Creating game..." });
-      gameId = await Backend.createGame();
-      this.setState({
-        loadingMessage: "Game created. Waiting for opponent..."
-      });
-      console.log("Game created");
+  }
+
+  componentWillUnmount() {
+    if (this.io) {
+      this.io.close();
     }
-    this.setState({ gameId });
-    this.unsubscribe = firebase
-      .firestore()
-      .collection("games")
-      .doc(gameId)
-      .onSnapshot(doc => {
-        if (doc.exists) {
-          const game = doc.data() as any;
-          console.log(game.playerIds);
-          if (game.winner) {
-            alert(`winner is ${game.winner}`);
-          }
-          this.setState({
-            loading: Object.keys(game.playerIds).length !== 2,
-            boardPositions: convertToPositions(game.moves),
-            playerIds: game.playerIds,
-            playerWhite: game.playerWhite,
-            winner: game.winner
-          });
-        }
-      });
   }
 
   makeMove = (position: { x: number; y: number }) => {
     Backend.makeMove(this.state.gameId, position);
   };
-
-  componentWillUnmount() {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
-    if (this.state.gameId) {
-      Backend.leaveGame(this.state.gameId);
-    }
-  }
 
   render() {
     return (
