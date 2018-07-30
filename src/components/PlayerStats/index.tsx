@@ -10,24 +10,26 @@ export default class PlayerStats extends React.Component {
       <View style={styles.players}>
         <View style={[styles.playerCard, styles.activePlayer]}>
           <View style={styles.playerHeader}>
-            <Text style={styles.playerName}>DUC</Text>
+            <Text style={styles.playerName}>DUCANHPHI1</Text>
+            <Text>1500</Text>
           </View>
           <View style={styles.playerType}>
             <Image source={ImageCross} style={{ width: 20, height: 20 }} />
           </View>
           <View style={styles.playerTime}>
-            <Text style={{ color: "#555555", fontSize: 20 }}> 5:00</Text>
+            <Text style={styles.playerTimeText}> 5:00</Text>
           </View>
         </View>
         <View style={[styles.playerCard, false && styles.activePlayer]}>
           <View style={styles.playerHeader}>
             <Text style={styles.playerName}>DAVID</Text>
+            <Text>1500</Text>
           </View>
           <View style={styles.playerType}>
             <Image source={ImageCircle} style={{ width: 20, height: 20 }} />
           </View>
           <View style={styles.playerTime}>
-            <Text style={{ color: "#555555", fontSize: 20 }}> 5:00</Text>
+            <Text style={styles.playerTimeText}> 5:00</Text>
           </View>
         </View>
       </View>
@@ -37,27 +39,25 @@ export default class PlayerStats extends React.Component {
 
 const styles = StyleSheet.create({
   players: {
-    margin: 10,
+    marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between"
   },
   playerCard: {
     width: 145,
-    padding: 15,
     opacity: 0.2,
     marginHorizontal: 10,
     position: "relative",
-    borderWidth: 2,
+    borderWidth: 5,
     borderRadius: 5
   },
   playerHeader: {
-    height: 25,
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center"
   },
   playerName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "600",
     color: "black"
   },
@@ -68,19 +68,21 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 5,
     alignItems: "center",
     justifyContent: "center",
-    height: 40,
-    width: 40,
+    height: 30,
+    width: 30,
     left: 0,
     bottom: 0
   },
   playerTime: {
-    marginTop: 8,
     flexDirection: "row",
     justifyContent: "center"
   },
+  playerTimeText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "black"
+  },
   activePlayer: {
-    backgroundColor: "#f7f7f7",
-    borderWidth: 2,
     opacity: 1
   }
 });
