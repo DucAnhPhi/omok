@@ -38,6 +38,7 @@ export default class OnlineGameView extends React.Component<undefined, State> {
     super(undefined);
     this.state = {
       loading: false,
+      playerIds: {},
       boardPositions: [...Array(15)].map(() => [...Array(15)]),
       gameId: null,
       playerWhite: null,

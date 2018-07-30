@@ -70,8 +70,8 @@ class LoginModal extends React.Component<Props, State> {
         // if profile for authenticated user exists
         navigator.dismissAllModals();
         navigator.push({
-          screen: "omok.OnlineGameView",
-          title: "ONLINE",
+          screen: "omok.GameListView",
+          title: "PLAY ONLINE",
           animated: true
         });
       } else {

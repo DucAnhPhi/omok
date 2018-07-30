@@ -26,8 +26,8 @@ class HomeView extends React.Component<Props> {
       if (profile) {
         // if profile was persisted in redux
         navigator.push({
-          screen: "omok.OnlineGameView",
-          title: "ONLINE",
+          screen: "omok.GameListView",
+          title: "PLAY ONLINE",
           animated: true
         });
       } else {

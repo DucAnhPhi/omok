@@ -43,9 +43,9 @@ class CreateProfileModal extends React.Component<Props, State> {
       this.props.updateProfile(newProfile);
       this.props.navigator.dismissAllModals();
       this.props.navigator.push({
-        screen: "omok.OnlineGameView",
-        animated: true,
-        title: "ONLINE"
+        screen: "omok.GameListView",
+        title: "PLAY ONLINE",
+        animated: true
       });
     }
   }
