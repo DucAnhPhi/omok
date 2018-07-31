@@ -1,19 +1,23 @@
 import React from "react";
 import {
-  Image,
-  ScrollView,
+  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from "react-native";
 import SocketIOClient from "socket.io-client";
+import { IGame } from "../../models";
 
 interface Props {
   navigator: any;
 }
 
-export default class GameListView extends React.Component<Props> {
+interface State {
+  gameList: IGame[];
+}
+
+export default class GameListView extends React.Component<Props, State> {
   static navigatorStyle = {
     navBarBackgroundColor: "#FEFAD4",
     topBarElevationShadowEnabled: false,
@@ -22,12 +26,19 @@ export default class GameListView extends React.Component<Props> {
 
   gameListSocket: SocketIOClient.Socket;
 
+  constructor() {
+    super(undefined);
+    this.state = {
+      gameList: []
+    };
+  }
+
   componentDidMount() {
     this.gameListSocket = SocketIOClient.connect(
       "http://192.168.178.51:3000/gameList"
     );
     this.gameListSocket.on("openGames", gameList => {
-      console.log(gameList);
+      this.setState({ gameList });
     });
   }
 
@@ -58,6 +69,27 @@ export default class GameListView extends React.Component<Props> {
     });
   }
 
+  renderGameItem(game: IGame) {
+    return (
+      <View style={styles.openGame}>
+        <View style={styles.gameCard}>
+          <View style={styles.time}>
+            <Text style={styles.text}>{game.time} m</Text>
+          </View>
+          <View style={styles.creator}>
+            <Text style={styles.textBold}>
+              {game.player1Name.toUpperCase()}
+            </Text>
+            <Text style={styles.text}>{game.player1Points}</Text>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.join}>
+          <Text style={styles.textBold}>JOIN</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -70,22 +102,11 @@ export default class GameListView extends React.Component<Props> {
             <Text style={styles.buttonLabel}>CREATE GAME</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView>
-          <View style={styles.openGame}>
-            <View style={styles.gameCard}>
-              <View style={styles.time}>
-                <Text style={styles.text}>5 m</Text>
-              </View>
-              <View style={styles.creator}>
-                <Text style={styles.textBold}>DUCANHPHI</Text>
-                <Text style={styles.text}>1500</Text>
-              </View>
-            </View>
-            <TouchableOpacity style={styles.join}>
-              <Text style={styles.textBold}>JOIN</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
+        <FlatList
+          data={this.state.gameList}
+          keyExtractor={(game: IGame) => game.gameId}
+          renderItem={({ item }) => this.renderGameItem(item)}
+        />
       </View>
     );
   }

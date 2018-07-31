@@ -1,16 +1,13 @@
 export interface IProfile {
   username: string;
   points: number;
-  win: number;
-  lose: number;
-  draw: number;
 }
 
 export interface IGame {
-  boardPositions: any[][];
-  playerIds: string[];
-  available: boolean;
-  playerWhite: string;
-  isWhiteTurn: boolean;
-  winner: string;
+  gameId: string;
+  player1: string;
+  player2: string;
+  player1Name: string;
+  player1Points: number;
+  time: number;
 }

@@ -1,16 +1,18 @@
 import React from "react";
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
 import firebase from "react-native-firebase";
+import { connect } from "react-redux";
 import SocketIOClient from "socket.io-client";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
-import Backend from "../../lib/backend";
+import { IProfile } from "../../models";
 
 interface Props {
   isCreating?: boolean;
   isJoining?: boolean;
   gameId: string;
+  profile: IProfile;
 }
 interface State {
   boardPositions: any[][];
@@ -31,7 +33,7 @@ const convertToPositions = (moves: { [key: string]: boolean }) => {
   return boardPositions;
 };
 
-export default class OnlineGameView extends React.Component<Props, State> {
+class OnlineGameView extends React.Component<Props, State> {
   static navigatorStyle = {
     navBarBackgroundColor: "#FEFAD4",
     topBarElevationShadowEnabled: false,
@@ -54,13 +56,13 @@ export default class OnlineGameView extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { isCreating, isJoining, gameId } = this.props;
+    const { isCreating, isJoining, gameId, profile } = this.props;
     const userId = firebase.auth().currentUser.uid;
     this.gameSocket = SocketIOClient.connect("http://192.168.178.51:3000/game");
-    if (this.props.isCreating) {
-      this.gameSocket.emit("createGame", { userId });
+    if (isCreating) {
+      this.gameSocket.emit("createGame", { userId, user: profile, time: 5 });
     }
-    if (this.props.isJoining) {
+    if (isJoining) {
       this.gameSocket.emit("joinGame", { userId, gameId });
     }
     this.gameSocket.on("gameCreated", initialGame => {
@@ -75,7 +77,7 @@ export default class OnlineGameView extends React.Component<Props, State> {
   }
 
   makeMove = (position: { x: number; y: number }) => {
-    Backend.makeMove(this.state.gameId, position);
+    // Backend.makeMove(this.state.gameId, position);
   };
 
   render() {
@@ -120,3 +122,9 @@ const styles = StyleSheet.create({
     alignItems: "center"
   }
 });
+
+const mapStateToProps = (state: any) => ({
+  profile: state.profileReducer.profile
+});
+
+export default connect(mapStateToProps)(OnlineGameView);
