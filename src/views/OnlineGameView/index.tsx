@@ -9,6 +9,8 @@ import Backend from "../../lib/backend";
 
 interface Props {
   isCreating?: boolean;
+  isJoining?: boolean;
+  gameId: string;
 }
 interface State {
   boardPositions: any[][];
@@ -36,7 +38,7 @@ export default class OnlineGameView extends React.Component<Props, State> {
     navBarTitleTextCentered: true
   };
 
-  io: SocketIOClient.Socket;
+  gameSocket: SocketIOClient.Socket;
 
   constructor() {
     super(undefined);
@@ -52,16 +54,23 @@ export default class OnlineGameView extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.io = SocketIOClient("http://192.168.178.51:3000");
-    this.io.emit("createGame", { userId: firebase.auth().currentUser.uid });
-    this.io.on("gameCreated", initialGame => {
+    const { isCreating, isJoining, gameId } = this.props;
+    const userId = firebase.auth().currentUser.uid;
+    this.gameSocket = SocketIOClient.connect("http://192.168.178.51:3000/game");
+    if (this.props.isCreating) {
+      this.gameSocket.emit("createGame", { userId });
+    }
+    if (this.props.isJoining) {
+      this.gameSocket.emit("joinGame", { userId, gameId });
+    }
+    this.gameSocket.on("gameCreated", initialGame => {
       console.log(initialGame);
     });
   }
 
   componentWillUnmount() {
-    if (this.io) {
-      this.io.close();
+    if (this.gameSocket) {
+      this.gameSocket.close();
     }
   }
 

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import SocketIOClient from "socket.io-client";
 
 interface Props {
   navigator: any;
@@ -19,12 +20,40 @@ export default class GameListView extends React.Component<Props> {
     navBarTitleTextCentered: true
   };
 
+  gameListSocket: SocketIOClient.Socket;
+
+  componentDidMount() {
+    this.gameListSocket = SocketIOClient.connect(
+      "http://192.168.178.51:3000/gameList"
+    );
+    this.gameListSocket.on("openGames", gameList => {
+      console.log(gameList);
+    });
+  }
+
+  componentWillUnmount() {
+    if (this.gameListSocket) {
+      this.gameListSocket.close();
+    }
+  }
+
   createGame() {
     this.props.navigator.push({
       screen: "omok.OnlineGameView",
       animated: true,
       passProps: {
         isCreating: true
+      }
+    });
+  }
+
+  joinGame(gameId: string) {
+    this.props.navigator.push({
+      screen: "omok.OnlineGameView",
+      animated: true,
+      passProps: {
+        isJoining: true,
+        gameId
       }
     });
   }
@@ -74,9 +103,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20
   },
   title: {
-    borderBottomWidth: 10,
+    borderBottomWidth: 5,
     borderColor: "black",
     fontSize: 20,
+    fontWeight: "600",
     color: "black",
     alignSelf: "flex-start"
   },
