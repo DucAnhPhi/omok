@@ -23,7 +23,8 @@ interface Props {
 interface State {
   loading: boolean;
   game: any;
-  timerRef: any;
+  hasTurn: boolean;
+  isPlayer1: boolean;
 }
 
 const convertToPositions = (moves: { [key: string]: boolean }) => {
@@ -50,28 +51,29 @@ class OnlineGameView extends React.Component<Props, State> {
     this.state = {
       loading: false,
       game: null,
-      timerRef: null
+      hasTurn: null,
+      isPlayer1: false
     };
   }
 
   componentDidMount() {
     const { isCreating, isJoining, profile, gameId } = this.props;
-    const userId = firebase.auth().currentUser.uid;
     this.gameSocket = SocketIOClient.connect("http://192.168.178.51:3000/game");
     if (isCreating) {
-      this.gameSocket.emit("createGame", { userId, user: profile, time: 5 });
+      this.gameSocket.emit("createGame", { user: profile, time: 5 });
     }
     if (isJoining) {
-      this.gameSocket.emit("joinGame", { gameId, userId });
+      this.gameSocket.emit("joinGame", { gameId, user: profile });
     }
     this.gameSocket.on("gameCreated", initialGame => {
-      this.setState({ game: initialGame });
+      this.setState({ isPlayer1: true, game: initialGame });
     });
     this.gameSocket.on("gameJoined", initialGame => {
       console.log(initialGame);
       this.setState({ game: initialGame });
     });
     this.gameSocket.on("move", () => {
+      this.setState({ hasTurn: true });
       this.timerRef = setInterval(() => {
         this.gameSocket.emit("tick", { gameId: this.state.game.gameId });
       }, 1000);
@@ -79,7 +81,21 @@ class OnlineGameView extends React.Component<Props, State> {
     this.gameSocket.on(
       "timeUpdated",
       (params: { time: number; isPlayer1: boolean }) => {
-        console.log(params.time, params.isPlayer1);
+        if (params.isPlayer1) {
+          this.setState({
+            game: {
+              ...this.state.game,
+              player1Time: params.time
+            }
+          });
+        } else {
+          this.setState({
+            game: {
+              ...this.state.game,
+              player2Time: params.time
+            }
+          });
+        }
       }
     );
   }
@@ -91,6 +107,7 @@ class OnlineGameView extends React.Component<Props, State> {
   }
 
   makeMove = () => {
+    this.setState({ hasTurn: false });
     this.gameSocket.emit("move", { gameId: this.state.game.gameId });
     clearInterval(this.timerRef);
   };
@@ -105,7 +122,40 @@ class OnlineGameView extends React.Component<Props, State> {
   render() {
     return (
       <View style={styles.container}>
-        {!this.state.loading && <PlayerStats />}
+        {this.state.game && (
+          <View style={styles.players}>
+            <PlayerStats
+              name={this.props.profile.username}
+              points={this.props.profile.points}
+              time={
+                this.state.isPlayer1
+                  ? this.state.game.player1Time
+                  : this.state.game.player2Time
+              }
+              hasTurn={this.state.hasTurn}
+              isPlayer1={this.state.isPlayer1}
+            />
+            <PlayerStats
+              name={
+                this.state.isPlayer1
+                  ? this.state.game.player2Name
+                  : this.state.game.player1Name
+              }
+              points={
+                this.state.isPlayer1
+                  ? this.state.game.player2Points
+                  : this.state.game.player1Points
+              }
+              time={
+                this.state.isPlayer1
+                  ? this.state.game.player2Time
+                  : this.state.game.player1Time
+              }
+              hasTurn={this.state.hasTurn === false}
+              isPlayer1={!this.state.isPlayer1}
+            />
+          </View>
+        )}
         {this.state.loading && (
           <View style={styles.loadingIndicator}>
             <ActivityIndicator size={"large"} color={"#8FB9A8"} />
@@ -133,6 +183,11 @@ class OnlineGameView extends React.Component<Props, State> {
 }
 
 const styles = StyleSheet.create({
+  players: {
+    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
   container: {
     backgroundColor: "#FEFAD4",
     alignItems: "center",
