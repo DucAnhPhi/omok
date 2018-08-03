@@ -4,45 +4,37 @@ import { Image, StyleSheet, Text, View } from "react-native";
 const ImageCross = require("./assets/cross.png");
 const ImageCircle = require("./assets/circle.png");
 
-export default class PlayerStats extends React.Component {
-  render() {
-    return (
-      <View style={styles.players}>
-        <View style={[styles.playerCard, styles.activePlayer]}>
-          <View style={styles.playerHeader}>
-            <Text style={styles.playerName}>DUCANHPHI1</Text>
-            <Text>1500</Text>
-          </View>
-          <View style={styles.playerType}>
-            <Image source={ImageCross} style={{ width: 20, height: 20 }} />
-          </View>
-          <View style={styles.playerTime}>
-            <Text style={styles.playerTimeText}> 5:00</Text>
-          </View>
-        </View>
-        <View style={[styles.playerCard, false && styles.activePlayer]}>
-          <View style={styles.playerHeader}>
-            <Text style={styles.playerName}>DAVID</Text>
-            <Text>1500</Text>
-          </View>
-          <View style={styles.playerType}>
-            <Image source={ImageCircle} style={{ width: 20, height: 20 }} />
-          </View>
-          <View style={styles.playerTime}>
-            <Text style={styles.playerTimeText}> 5:00</Text>
-          </View>
-        </View>
+interface Props {
+  name: string;
+  points: number;
+  isPlayer1: boolean;
+  time: number;
+  hasTurn: boolean;
+}
+
+export default function PlayerStats(props: Props) {
+  return (
+    <View style={[styles.playerCard, props.hasTurn && styles.activePlayer]}>
+      <View style={styles.playerHeader}>
+        <Text style={styles.playerName}>{props.name}</Text>
+        <Text>{props.points}</Text>
       </View>
-    );
-  }
+      <View style={styles.playerType}>
+        <Image
+          source={props.isPlayer1 ? ImageCross : ImageCircle}
+          style={{ width: 20, height: 20 }}
+        />
+      </View>
+      <View style={styles.playerTime}>
+        <Text style={styles.playerTimeText}>
+          {props.time ? props.time : "-"}
+        </Text>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  players: {
-    marginBottom: 10,
-    flexDirection: "row",
-    justifyContent: "space-between"
-  },
   playerCard: {
     width: 145,
     opacity: 0.2,
