@@ -83,7 +83,10 @@ export default class GameListView extends React.Component<Props, State> {
             <Text style={styles.text}>{game.player1Points}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.join}>
+        <TouchableOpacity
+          style={styles.join}
+          onPress={() => this.joinGame(game.gameId)}
+        >
           <Text style={styles.textBold}>JOIN</Text>
         </TouchableOpacity>
       </View>

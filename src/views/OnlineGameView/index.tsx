@@ -1,5 +1,11 @@
 import React from "react";
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import firebase from "react-native-firebase";
 import { connect } from "react-redux";
 import SocketIOClient from "socket.io-client";
@@ -11,17 +17,13 @@ import { IProfile } from "../../models";
 interface Props {
   isCreating?: boolean;
   isJoining?: boolean;
-  gameId: string;
+  gameId?: string;
   profile: IProfile;
 }
 interface State {
-  boardPositions: any[][];
-  gameId: string;
-  playerIds: { [key: string]: boolean };
-  playerWhite: string;
   loading: boolean;
-  loadingMessage: string;
-  winner: string;
+  game: any;
+  timerRef: any;
 }
 
 const convertToPositions = (moves: { [key: string]: boolean }) => {
@@ -41,33 +43,45 @@ class OnlineGameView extends React.Component<Props, State> {
   };
 
   gameSocket: SocketIOClient.Socket;
+  timerRef: number;
 
   constructor() {
     super(undefined);
     this.state = {
       loading: false,
-      playerIds: {},
-      boardPositions: [...Array(15)].map(() => [...Array(15)]),
-      gameId: null,
-      playerWhite: null,
-      loadingMessage: null,
-      winner: null
+      game: null,
+      timerRef: null
     };
   }
 
   componentDidMount() {
-    const { isCreating, isJoining, gameId, profile } = this.props;
+    const { isCreating, isJoining, profile, gameId } = this.props;
     const userId = firebase.auth().currentUser.uid;
     this.gameSocket = SocketIOClient.connect("http://192.168.178.51:3000/game");
     if (isCreating) {
       this.gameSocket.emit("createGame", { userId, user: profile, time: 5 });
     }
     if (isJoining) {
-      this.gameSocket.emit("joinGame", { userId, gameId });
+      this.gameSocket.emit("joinGame", { gameId, userId });
     }
     this.gameSocket.on("gameCreated", initialGame => {
-      console.log(initialGame);
+      this.setState({ game: initialGame });
     });
+    this.gameSocket.on("gameJoined", initialGame => {
+      console.log(initialGame);
+      this.setState({ game: initialGame });
+    });
+    this.gameSocket.on("move", () => {
+      this.timerRef = setInterval(() => {
+        this.gameSocket.emit("tick", { gameId: this.state.game.gameId });
+      }, 1000);
+    });
+    this.gameSocket.on(
+      "timeUpdated",
+      (params: { time: number; isPlayer1: boolean }) => {
+        console.log(params.time, params.isPlayer1);
+      }
+    );
   }
 
   componentWillUnmount() {
@@ -76,9 +90,17 @@ class OnlineGameView extends React.Component<Props, State> {
     }
   }
 
-  makeMove = (position: { x: number; y: number }) => {
-    // Backend.makeMove(this.state.gameId, position);
+  makeMove = () => {
+    this.gameSocket.emit("move", { gameId: this.state.game.gameId });
+    clearInterval(this.timerRef);
   };
+
+  playerReady() {
+    const { game } = this.state;
+    if (game) {
+      this.gameSocket.emit("playerReady", { gameId: game.gameId });
+    }
+  }
 
   render() {
     return (
@@ -87,13 +109,19 @@ class OnlineGameView extends React.Component<Props, State> {
         {this.state.loading && (
           <View style={styles.loadingIndicator}>
             <ActivityIndicator size={"large"} color={"#8FB9A8"} />
-            <Text>{this.state.loadingMessage}</Text>
+            {/* <Text>{this.state.loadingMessage}</Text> */}
           </View>
         )}
-        <Board
+        <TouchableOpacity onPress={() => this.playerReady()}>
+          <Text>READY</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => this.makeMove()}>
+          <Text>move</Text>
+        </TouchableOpacity>
+        {/* <Board
           boardPositions={this.state.boardPositions}
           makeMove={this.makeMove}
-        />
+        /> */}
         <View style={styles.actionButtons}>
           <ActionButton label={"redo"} />
           <ActionButton label={"draw"} />
