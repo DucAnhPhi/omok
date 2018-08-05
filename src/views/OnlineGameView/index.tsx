@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import firebase from "react-native-firebase";
 import { connect } from "react-redux";
 import SocketIOClient from "socket.io-client";
 import ActionButton from "../../components/ActionButton";
@@ -85,11 +84,24 @@ class OnlineGameView extends React.Component<Props, State> {
       console.log(initialGame);
       this.setState({
         opponent: {
-          name: initialGame.player1Name,
-          points: initialGame.player1Points,
+          name: this.state.isPlayer1
+            ? initialGame.player2Name
+            : initialGame.player1Name,
+          points: this.state.isPlayer1
+            ? initialGame.player2Points
+            : initialGame.player1Points,
           playerTime: initialGame.timeMode * 60
-        }
+        },
+        playerTime: initialGame.timeMode * 60,
+        timeMode: initialGame.timeMode
       });
+    });
+    this.gameSocket.on("playing", () => {
+      if (!this.state.isPlayer1) {
+        this.setState({
+          hasTurn: false
+        });
+      }
     });
     this.gameSocket.on("playerLeft", () => {
       this.setState({
@@ -127,6 +139,7 @@ class OnlineGameView extends React.Component<Props, State> {
   componentWillUnmount() {
     if (this.gameSocket) {
       this.gameSocket.close();
+      clearInterval(this.timerRef);
     }
   }
 
