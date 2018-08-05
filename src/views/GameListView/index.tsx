@@ -74,7 +74,7 @@ export default class GameListView extends React.Component<Props, State> {
       <View style={styles.openGame}>
         <View style={styles.gameCard}>
           <View style={styles.time}>
-            <Text style={styles.text}>{game.time} m</Text>
+            <Text style={styles.text}>{game.timeMode} m</Text>
           </View>
           <View style={styles.creator}>
             <Text style={styles.textBold}>
