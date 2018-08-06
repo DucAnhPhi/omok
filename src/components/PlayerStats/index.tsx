@@ -10,13 +10,19 @@ interface Props {
   isPlayer1: boolean;
   time: number;
   hasTurn: boolean;
+  isReady?: boolean;
 }
 
 export default function PlayerStats(props: Props) {
   return (
     <View style={[styles.playerCard, props.hasTurn && styles.activePlayer]}>
       <View style={styles.playerHeader}>
-        <Text style={styles.playerName}>{props.name}</Text>
+        <View>
+          <Text style={styles.playerName}>{props.name}</Text>
+          {props.isReady && (
+            <Image source={ImageCircle} style={{ width: 20, height: 20 }} />
+          )}
+        </View>
         <Text>{props.points}</Text>
       </View>
       <View style={styles.playerType}>

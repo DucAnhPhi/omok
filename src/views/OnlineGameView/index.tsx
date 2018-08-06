@@ -28,8 +28,10 @@ interface State {
     name: string;
     points: number;
     playerTime: number;
+    isReady: boolean;
   };
   gameId: string;
+  isReady: boolean;
 }
 
 const convertToPositions = (moves: { [key: string]: boolean }) => {
@@ -59,7 +61,8 @@ class OnlineGameView extends React.Component<Props, State> {
       isPlayer1: false,
       playerTime: null,
       timeMode: null,
-      opponent: null
+      opponent: null,
+      isReady: false
     };
   }
 
@@ -72,6 +75,7 @@ class OnlineGameView extends React.Component<Props, State> {
     if (isJoining) {
       this.gameSocket.emit("joinGame", { gameId, user: profile });
     }
+
     this.gameSocket.on("gameCreated", initialGame => {
       this.setState({
         isPlayer1: true,
@@ -80,6 +84,7 @@ class OnlineGameView extends React.Component<Props, State> {
         timeMode: initialGame.timeMode
       });
     });
+
     this.gameSocket.on("gameJoined", initialGame => {
       console.log(initialGame);
       this.setState({
@@ -90,33 +95,50 @@ class OnlineGameView extends React.Component<Props, State> {
           points: this.state.isPlayer1
             ? initialGame.player2Points
             : initialGame.player1Points,
-          playerTime: initialGame.timeMode * 60
+          playerTime: initialGame.timeMode * 60,
+          isReady: this.state.isPlayer1
+            ? initialGame.player2Ready === "true"
+            : initialGame.player1Ready === "true"
         },
         playerTime: initialGame.timeMode * 60,
         timeMode: initialGame.timeMode
       });
     });
-    this.gameSocket.on("playing", () => {
+
+    this.gameSocket.on("playerReady", () => {
+      this.setState({
+        opponent: {
+          ...this.state.opponent,
+          isReady: true
+        }
+      });
+    });
+
+    this.gameSocket.on("gameStarted", () => {
       if (!this.state.isPlayer1) {
         this.setState({
           hasTurn: false
         });
       }
     });
+
     this.gameSocket.on("playerLeft", () => {
       this.setState({
         opponent: null,
         isPlayer1: true,
         hasTurn: null,
+        isReady: false,
         playerTime: this.state.timeMode * 60
       });
     });
+
     this.gameSocket.on("move", () => {
       this.setState({ hasTurn: true });
       this.timerRef = setInterval(() => {
         this.gameSocket.emit("tick", { gameId: this.state.gameId });
       }, 1000);
     });
+
     this.gameSocket.on(
       "timeUpdated",
       (params: { playerTime: number; isPlayer1: boolean }) => {
@@ -150,6 +172,9 @@ class OnlineGameView extends React.Component<Props, State> {
   };
 
   playerReady() {
+    this.setState({
+      isReady: true
+    });
     const { gameId } = this.state;
     if (gameId) {
       this.gameSocket.emit("playerReady", { gameId });
@@ -166,6 +191,7 @@ class OnlineGameView extends React.Component<Props, State> {
             time={this.state.playerTime}
             hasTurn={this.state.hasTurn}
             isPlayer1={this.state.isPlayer1}
+            isReady={this.state.isReady}
           />
           {this.state.opponent && (
             <PlayerStats
@@ -174,6 +200,7 @@ class OnlineGameView extends React.Component<Props, State> {
               time={this.state.opponent.playerTime}
               hasTurn={this.state.hasTurn === false}
               isPlayer1={!this.state.isPlayer1}
+              isReady={this.state.opponent.isReady}
             />
           )}
           {!this.state.opponent && (
