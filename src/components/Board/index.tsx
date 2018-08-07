@@ -65,7 +65,7 @@ export default class Board extends React.Component<Props, State> {
         );
         const newBoardPositions = this.props.boardPositions.slice();
         // cancel if tile is already occupied
-        if (newBoardPositions[cursorY][cursorX] !== undefined) {
+        if (newBoardPositions[cursorY][cursorX] !== null) {
           return;
         }
         this.setState({
@@ -83,7 +83,7 @@ export default class Board extends React.Component<Props, State> {
         );
         const newBoardPositions = this.props.boardPositions.slice();
         this.setState({
-          cursorActive: newBoardPositions[cursorY][cursorX] === undefined, // cancel if tile is already occupied
+          cursorActive: newBoardPositions[cursorY][cursorX] === null, // cancel if tile is already occupied
           cursorX,
           cursorY
         });
@@ -92,8 +92,7 @@ export default class Board extends React.Component<Props, State> {
         const newBoardPositions = this.props.boardPositions.slice();
         // cancel if tile is already occupied
         if (
-          newBoardPositions[this.state.cursorY][this.state.cursorX] !==
-          undefined
+          newBoardPositions[this.state.cursorY][this.state.cursorX] !== null
         ) {
           return;
         }

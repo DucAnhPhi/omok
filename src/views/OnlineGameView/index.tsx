@@ -32,6 +32,7 @@ interface State {
   };
   gameId: string;
   isReady: boolean;
+  boardPositions: any[];
 }
 
 const convertToPositions = (moves: { [key: string]: boolean }) => {
@@ -62,7 +63,10 @@ class OnlineGameView extends React.Component<Props, State> {
       playerTime: null,
       timeMode: null,
       opponent: null,
-      isReady: false
+      isReady: false,
+      boardPositions: Array(15)
+        .fill(null)
+        .map(() => Array(15).fill(null))
     };
   }
 
@@ -132,7 +136,23 @@ class OnlineGameView extends React.Component<Props, State> {
       });
     });
 
-    this.gameSocket.on("move", () => {
+    this.gameSocket.on("updateBoard", boardPositions => {
+      console.log(boardPositions);
+      this.setState({
+        boardPositions
+      });
+    });
+
+    this.gameSocket.on(
+      "gameEnded",
+      (params: { victory?: boolean; draw?: boolean }) => {
+        if (params.victory) {
+          alert(`player ${params.victory} won`);
+        }
+      }
+    );
+
+    this.gameSocket.on("turn", () => {
       this.setState({ hasTurn: true });
       this.timerRef = setInterval(() => {
         this.gameSocket.emit("tick", { gameId: this.state.gameId });
@@ -165,9 +185,10 @@ class OnlineGameView extends React.Component<Props, State> {
     }
   }
 
-  makeMove = () => {
+  makeMove = (position: { x: number; y: number }) => {
+    console.log("move");
     this.setState({ hasTurn: false });
-    this.gameSocket.emit("move", { gameId: this.state.gameId });
+    this.gameSocket.emit("move", { gameId: this.state.gameId, position });
     clearInterval(this.timerRef);
   };
 
@@ -213,18 +234,17 @@ class OnlineGameView extends React.Component<Props, State> {
         <TouchableOpacity onPress={() => this.playerReady()}>
           <Text>READY</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => this.makeMove()}>
-          <Text>move</Text>
-        </TouchableOpacity>
-        {/* <Board
-          boardPositions={this.state.boardPositions}
-          makeMove={this.makeMove}
-        /> */}
         <View style={styles.actionButtons}>
           <ActionButton label={"redo"} />
           <ActionButton label={"draw"} />
           <ActionButton label={"give up"} isRed={true} />
         </View>
+        <Board
+          boardPositions={this.state.boardPositions}
+          makeMove={(position: { x: number; y: number }) =>
+            this.makeMove(position)
+          }
+        />
       </View>
     );
   }
