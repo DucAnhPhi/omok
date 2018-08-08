@@ -327,7 +327,6 @@ class OnlineGameView extends React.Component<Props, State> {
               this.offer("draw");
             }}
           />
-          <ActionButton label={"give up"} isRed={true} />
         </View>
         <Board
           boardPositions={this.state.boardPositions}
