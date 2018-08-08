@@ -84,7 +84,7 @@ class OnlineGameView extends React.Component<Props, State> {
       this.setState({
         isPlayer1: true,
         gameId: initialGame.gameId,
-        playerTime: initialGame.timeMode * 60,
+        playerTime: initialGame.player1Time,
         timeMode: initialGame.timeMode
       });
     });
@@ -99,12 +99,12 @@ class OnlineGameView extends React.Component<Props, State> {
           points: this.state.isPlayer1
             ? initialGame.player2Points
             : initialGame.player1Points,
-          playerTime: initialGame.timeMode * 60,
+          playerTime: initialGame.player1Time,
           isReady: this.state.isPlayer1
             ? initialGame.player2Ready === "true"
             : initialGame.player1Ready === "true"
         },
-        playerTime: initialGame.timeMode * 60,
+        playerTime: initialGame.player1Time,
         timeMode: initialGame.timeMode
       });
     });
@@ -127,6 +127,7 @@ class OnlineGameView extends React.Component<Props, State> {
     });
 
     this.gameSocket.on("playerLeft", () => {
+      clearInterval(this.timerRef);
       this.setState({
         opponent: null,
         isPlayer1: true,
@@ -146,6 +147,11 @@ class OnlineGameView extends React.Component<Props, State> {
     this.gameSocket.on(
       "gameEnded",
       (params: { victory?: boolean; draw?: boolean }) => {
+        this.setState({
+          isReady: false,
+          hasTurn: null,
+          opponent: { ...this.state.opponent, isReady: false }
+        });
         if (params.victory) {
           alert(`player ${params.victory} won`);
         }
@@ -193,8 +199,17 @@ class OnlineGameView extends React.Component<Props, State> {
   };
 
   playerReady() {
+    // clear board and timers and set current player ready
     this.setState({
-      isReady: true
+      isReady: true,
+      playerTime: this.state.timeMode * 60,
+      boardPositions: Array(15)
+        .fill(null)
+        .map(() => Array(15).fill(null)),
+      opponent: {
+        ...this.state.opponent,
+        playerTime: this.state.timeMode * 60
+      }
     });
     const { gameId } = this.state;
     if (gameId) {
