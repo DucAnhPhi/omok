@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ActivityIndicator,
+  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -33,6 +34,8 @@ interface State {
   gameId: string;
   isReady: boolean;
   boardPositions: any[];
+  rejectedDraw: boolean;
+  rejectedRedo: boolean;
 }
 
 const convertToPositions = (moves: { [key: string]: boolean }) => {
@@ -66,7 +69,9 @@ class OnlineGameView extends React.Component<Props, State> {
       isReady: false,
       boardPositions: Array(15)
         .fill(null)
-        .map(() => Array(15).fill(null))
+        .map(() => Array(15).fill(null)),
+      rejectedDraw: false,
+      rejectedRedo: false
     };
   }
 
@@ -146,20 +151,30 @@ class OnlineGameView extends React.Component<Props, State> {
 
     this.gameSocket.on(
       "gameEnded",
-      (params: { victory?: boolean; draw?: boolean }) => {
+      (params: { victory?: string; draw?: boolean }) => {
+        clearInterval(this.timerRef);
         this.setState({
           isReady: false,
           hasTurn: null,
+          rejectedDraw: false,
+          rejectedRedo: false,
           opponent: { ...this.state.opponent, isReady: false }
         });
         if (params.victory) {
           alert(`player ${params.victory} won`);
         }
+        if (params.draw) {
+          alert("draw");
+        }
       }
     );
 
     this.gameSocket.on("turn", () => {
-      this.setState({ hasTurn: true });
+      this.setState({
+        hasTurn: true,
+        rejectedDraw: false,
+        rejectedRedo: false
+      });
       this.timerRef = setInterval(() => {
         this.gameSocket.emit("tick", { gameId: this.state.gameId });
       }, 1000);
@@ -182,6 +197,52 @@ class OnlineGameView extends React.Component<Props, State> {
         }
       }
     );
+
+    this.gameSocket.on("offer", (type: "redo" | "draw") => {
+      if (
+        (this.state.rejectedDraw && type === "draw") ||
+        (this.state.rejectedRedo && type === "redo")
+      ) {
+        return;
+      }
+      let alertTitle;
+      let alertMessage;
+      if (type === "redo") {
+        alertTitle = "Redo Request";
+        alertMessage = `${
+          this.state.opponent.name
+        } requests to redo the recent move.`;
+      }
+      if (type === "draw") {
+        alertTitle = "Draw Offer";
+        alertMessage = `${this.state.opponent.name} offers a draw.`;
+      }
+      Alert.alert(alertTitle, alertMessage, [
+        {
+          text: "reject",
+          onPress: () => {
+            if (type === "redo") {
+              this.setState({ rejectedRedo: true });
+            }
+            if (type === "draw") {
+              this.setState({ rejectedDraw: true });
+            }
+          },
+          style: "cancel"
+        },
+        {
+          text: "accept",
+          onPress: () => {
+            clearInterval(this.timerRef);
+            this.gameSocket.emit("offerAccepted", {
+              gameId: this.state.gameId,
+              type
+            });
+            this.setState({ hasTurn: false });
+          }
+        }
+      ]);
+    });
   }
 
   componentWillUnmount() {
@@ -217,6 +278,10 @@ class OnlineGameView extends React.Component<Props, State> {
     }
   }
 
+  offer(type: "draw" | "redo") {
+    this.gameSocket.emit("offer", { gameId: this.state.gameId, type });
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -250,8 +315,18 @@ class OnlineGameView extends React.Component<Props, State> {
           <Text>READY</Text>
         </TouchableOpacity>
         <View style={styles.actionButtons}>
-          <ActionButton label={"redo"} />
-          <ActionButton label={"draw"} />
+          <ActionButton
+            label={"redo"}
+            onPress={() => {
+              this.offer("redo");
+            }}
+          />
+          <ActionButton
+            label={"draw"}
+            onPress={() => {
+              this.offer("draw");
+            }}
+          />
           <ActionButton label={"give up"} isRed={true} />
         </View>
         <Board
