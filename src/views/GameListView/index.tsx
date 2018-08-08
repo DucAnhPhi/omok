@@ -37,6 +37,9 @@ export default class GameListView extends React.Component<Props, State> {
     this.gameListSocket = SocketIOClient.connect(
       "http://192.168.178.51:3000/gameList"
     );
+    this.gameListSocket.once("connect", gameList => {
+      this.setState({gameList});
+    })
     this.gameListSocket.on("openGames", gameList => {
       this.setState({ gameList });
     });
