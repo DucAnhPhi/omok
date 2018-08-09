@@ -38,6 +38,7 @@ interface State {
   rejectedRedo: boolean;
   requestedDraw: boolean;
   requestedRedo: boolean;
+  gameEndType: "win" | "lose" | "draw" | null;
 }
 
 class OnlineGameView extends React.Component<Props, State> {
@@ -66,7 +67,8 @@ class OnlineGameView extends React.Component<Props, State> {
       rejectedDraw: false,
       rejectedRedo: false,
       requestedDraw: false,
-      requestedRedo: false
+      requestedRedo: false,
+      gameEndType: null
     };
   }
 
@@ -140,7 +142,8 @@ class OnlineGameView extends React.Component<Props, State> {
         rejectedRedo: false,
         requestedDraw: false,
         requestedRedo: false,
-        playerTime: this.state.timeMode * 60
+        playerTime: this.state.timeMode * 60,
+        gameEndType: this.state.hasTurn === null ? null : "win"
       });
     });
 
@@ -155,25 +158,22 @@ class OnlineGameView extends React.Component<Props, State> {
       "gameEnded",
       (params: { victory?: { isPlayer1: boolean }; draw?: boolean }) => {
         clearInterval(this.timerRef);
+        let gameEndType;
+        if (params.draw) {
+          gameEndType = "draw";
+        }
+        if (params.victory !== undefined) {
+          gameEndType =
+            params.victory.isPlayer1 === this.state.isPlayer1 ? "win" : "lose";
+        }
         this.setState({
           hasTurn: null,
           rejectedDraw: false,
           rejectedRedo: false,
           requestedDraw: false,
-          requestedRedo: false
+          requestedRedo: false,
+          gameEndType
         });
-        if (params.victory) {
-          alert(
-            `${
-              params.victory.isPlayer1 === this.state.isPlayer1
-                ? this.props.profile.username
-                : this.state.opponent.name
-            } won`
-          );
-        }
-        if (params.draw) {
-          alert("draw");
-        }
       }
     );
 
@@ -282,7 +282,8 @@ class OnlineGameView extends React.Component<Props, State> {
             ...this.state.opponent,
             playerTime: this.state.timeMode * 60
           }
-        : null
+        : null,
+      gameEndType: null
     });
     const { gameId } = this.state;
     if (gameId) {
@@ -365,6 +366,7 @@ class OnlineGameView extends React.Component<Props, State> {
           makeMove={(position: { x: number; y: number }) =>
             this.makeMove(position)
           }
+          gameEndType={this.state.gameEndType}
           disabled={!this.state.hasTurn}
         />
       </View>

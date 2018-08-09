@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  Alert,
   Dimensions,
   Image,
   PanResponder,
   PanResponderInstance,
   StyleSheet,
+  Text,
   View
 } from "react-native";
 
@@ -21,6 +21,7 @@ const tileSize = screenWidth / 15;
 interface Props {
   boardPositions: any[][];
   disabled?: boolean;
+  gameEndType?: "win" | "lose" | "draw";
   makeMove: (position: { x: number; y: number }) => void;
 }
 interface State {
@@ -107,15 +108,6 @@ export default class Board extends React.Component<Props, State> {
     });
   }
 
-  componentWillUnmount() {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
-    // if (this.state.gameId) {
-    //   Backend.leaveGame(this.state.gameId);
-    // }
-  }
-
   getYPosition(e) {
     this.setState({
       boardPositionY: e.nativeEvent.layout.y
@@ -162,6 +154,19 @@ export default class Board extends React.Component<Props, State> {
     ));
   }
 
+  getGameEndLabel() {
+    const { gameEndType } = this.props;
+    if (gameEndType === "win") {
+      return "YOU WIN";
+    }
+    if (gameEndType === "lose") {
+      return "YOU LOSE";
+    }
+    if (gameEndType === "draw") {
+      return "DRAW";
+    }
+  }
+
   render() {
     return (
       <View
@@ -170,6 +175,11 @@ export default class Board extends React.Component<Props, State> {
         {...this.panResponder.panHandlers}
       >
         {this.renderBoardPositions()}
+        {this.props.gameEndType && (
+          <View style={styles.overlay}>
+            <Text style={styles.overlayText}>{this.getGameEndLabel()}</Text>
+          </View>
+        )}
       </View>
     );
   }
@@ -177,7 +187,8 @@ export default class Board extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   board: {
-    marginTop: 10
+    marginTop: 10,
+    position: "relative"
   },
   row: {
     flexDirection: "row"
@@ -186,5 +197,19 @@ const styles = StyleSheet.create({
     position: "relative",
     justifyContent: "center",
     alignItems: "center"
+  },
+  overlay: {
+    position: "absolute",
+    zIndex: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 100,
+    backgroundColor: "#765D69"
+  },
+  overlayText: {
+    fontSize: 40,
+    color: "black",
+    fontWeight: "600"
   }
 });
