@@ -36,6 +36,8 @@ interface State {
   boardPositions: any[];
   rejectedDraw: boolean;
   rejectedRedo: boolean;
+  requestedDraw: boolean;
+  requestedRedo: boolean;
 }
 
 class OnlineGameView extends React.Component<Props, State> {
@@ -62,7 +64,9 @@ class OnlineGameView extends React.Component<Props, State> {
         .fill(null)
         .map(() => Array(15).fill(null)),
       rejectedDraw: false,
-      rejectedRedo: false
+      rejectedRedo: false,
+      requestedDraw: false,
+      requestedRedo: false
     };
   }
 
@@ -149,6 +153,8 @@ class OnlineGameView extends React.Component<Props, State> {
           hasTurn: null,
           rejectedDraw: false,
           rejectedRedo: false,
+          requestedDraw: false,
+          requestedRedo: false,
           opponent: { ...this.state.opponent, isReady: false }
         });
         if (params.victory) {
@@ -170,7 +176,9 @@ class OnlineGameView extends React.Component<Props, State> {
       this.setState({
         hasTurn: true,
         rejectedDraw: false,
-        rejectedRedo: false
+        rejectedRedo: false,
+        requestedDraw: false,
+        requestedRedo: false
       });
       this.timerRef = setInterval(() => {
         this.gameSocket.emit("tick", { gameId: this.state.gameId });
@@ -278,6 +286,16 @@ class OnlineGameView extends React.Component<Props, State> {
   }
 
   offer(type: "draw" | "redo") {
+    if (type === "draw") {
+      this.setState({
+        requestedDraw: true
+      });
+    }
+    if (type === "redo") {
+      this.setState({
+        requestedRedo: true
+      });
+    }
     this.gameSocket.emit("offer", { gameId: this.state.gameId, type });
   }
 
@@ -326,12 +344,14 @@ class OnlineGameView extends React.Component<Props, State> {
               onPress={() => {
                 this.offer("redo");
               }}
+              disabled={this.state.hasTurn || this.state.requestedRedo}
             />
             <ActionButton
               label={"draw"}
               onPress={() => {
                 this.offer("draw");
               }}
+              disabled={this.state.requestedDraw}
             />
           </View>
         )}
