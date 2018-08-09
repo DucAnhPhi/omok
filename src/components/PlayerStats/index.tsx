@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, View } from "react-native";
 
 const ImageCross = require("./assets/cross.png");
 const ImageCircle = require("./assets/circle.png");
+const ImageReady = require("./assets/ready.png");
 
 interface Props {
   name: string;
@@ -20,7 +21,7 @@ export default function PlayerStats(props: Props) {
         <View>
           <Text style={styles.playerName}>{props.name}</Text>
           {props.isReady && (
-            <Image source={ImageCircle} style={{ width: 20, height: 20 }} />
+            <Image source={ImageReady} style={{ width: 20, height: 20 }} />
           )}
         </View>
         <Text>{props.points}</Text>

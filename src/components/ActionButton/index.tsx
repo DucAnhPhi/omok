@@ -24,7 +24,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#FCD0BA",
-    borderRadius: 5
+    borderRadius: 5,
+    marginHorizontal: 10
   },
   buttonLabel: {
     color: "black",

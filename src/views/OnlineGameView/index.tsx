@@ -38,15 +38,6 @@ interface State {
   rejectedRedo: boolean;
 }
 
-const convertToPositions = (moves: { [key: string]: boolean }) => {
-  const boardPositions = [...Array(15)].map(() => [...Array(15)]);
-  Object.keys(moves).map(move => {
-    const position = JSON.parse(move); // { x: number, y: number}
-    boardPositions[position.y][position.x] = moves[move];
-  });
-  return boardPositions;
-};
-
 class OnlineGameView extends React.Component<Props, State> {
   static navigatorStyle = {
     navBarBackgroundColor: "#FEFAD4",
@@ -352,9 +343,7 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     marginTop: 15,
-    flexDirection: "row",
-    width: 270,
-    justifyContent: "space-between"
+    flexDirection: "row"
   },
   loadingIndicator: {
     borderWidth: 5,

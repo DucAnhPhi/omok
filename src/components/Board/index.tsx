@@ -136,12 +136,7 @@ export default class Board extends React.Component<Props, State> {
     return this.props.boardPositions.map((row, rowI) => (
       <View style={styles.row} key={rowI}>
         {row.map((col, colI) => (
-          <View
-            key={rowI + colI}
-            style={{
-              position: "relative"
-            }}
-          >
+          <View key={rowI + colI} style={styles.field}>
             <Image
               source={this.getTile(rowI, colI)}
               style={{
@@ -149,22 +144,12 @@ export default class Board extends React.Component<Props, State> {
                 height: tileSize
               }}
             />
-            {col && (
+            {col !== null && (
               <Image
-                source={ImageCross}
+                source={col ? ImageCross : ImageCircle}
                 style={{
-                  width: tileSize,
-                  height: tileSize,
-                  position: "absolute"
-                }}
-              />
-            )}
-            {col === false && (
-              <Image
-                source={ImageCircle}
-                style={{
-                  width: tileSize,
-                  height: tileSize,
+                  width: tileSize - 4,
+                  height: tileSize - 4,
                   position: "absolute"
                 }}
               />
@@ -196,7 +181,8 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   field: {
-    height: tileSize,
-    width: tileSize
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center"
   }
 });
