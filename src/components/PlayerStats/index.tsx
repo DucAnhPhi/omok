@@ -1,5 +1,6 @@
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
+import { formatSeconds } from "../../lib/time";
 
 const ImageCross = require("./assets/cross.png");
 const ImageCircle = require("./assets/circle.png");
@@ -34,7 +35,7 @@ export default function PlayerStats(props: Props) {
       </View>
       <View style={styles.playerTime}>
         <Text style={styles.playerTimeText}>
-          {props.time ? props.time : "-"}
+          {props.time ? formatSeconds(props.time) : "-"}
         </Text>
       </View>
     </View>
