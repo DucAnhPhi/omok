@@ -119,11 +119,14 @@ class OnlineGameView extends React.Component<Props, State> {
     });
 
     this.gameSocket.on("gameStarted", () => {
-      if (!this.state.isPlayer1) {
-        this.setState({
-          hasTurn: false
-        });
-      }
+      this.setState({
+        hasTurn: this.state.isPlayer1,
+        isReady: false,
+        opponent: {
+          ...this.state.opponent,
+          isReady: false
+        }
+      });
     });
 
     this.gameSocket.on("playerLeft", () => {
@@ -133,6 +136,10 @@ class OnlineGameView extends React.Component<Props, State> {
         isPlayer1: true,
         hasTurn: null,
         isReady: false,
+        rejectedDraw: false,
+        rejectedRedo: false,
+        requestedDraw: false,
+        requestedRedo: false,
         playerTime: this.state.timeMode * 60
       });
     });
@@ -149,13 +156,11 @@ class OnlineGameView extends React.Component<Props, State> {
       (params: { victory?: { isPlayer1: boolean }; draw?: boolean }) => {
         clearInterval(this.timerRef);
         this.setState({
-          isReady: false,
           hasTurn: null,
           rejectedDraw: false,
           rejectedRedo: false,
           requestedDraw: false,
-          requestedRedo: false,
-          opponent: { ...this.state.opponent, isReady: false }
+          requestedRedo: false
         });
         if (params.victory) {
           alert(
