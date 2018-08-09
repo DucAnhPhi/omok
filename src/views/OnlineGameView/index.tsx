@@ -142,7 +142,7 @@ class OnlineGameView extends React.Component<Props, State> {
 
     this.gameSocket.on(
       "gameEnded",
-      (params: { victory?: string; draw?: boolean }) => {
+      (params: { victory?: { isPlayer1: boolean }; draw?: boolean }) => {
         clearInterval(this.timerRef);
         this.setState({
           isReady: false,
@@ -152,7 +152,13 @@ class OnlineGameView extends React.Component<Props, State> {
           opponent: { ...this.state.opponent, isReady: false }
         });
         if (params.victory) {
-          alert(`player ${params.victory} won`);
+          alert(
+            `${
+              params.victory.isPlayer1 === this.state.isPlayer1
+                ? this.props.profile.username
+                : this.state.opponent.name
+            } won`
+          );
         }
         if (params.draw) {
           alert("draw");
