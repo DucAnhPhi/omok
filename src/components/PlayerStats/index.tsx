@@ -21,18 +21,14 @@ export default function PlayerStats(props: Props) {
       <View style={styles.playerHeader}>
         <View>
           <Text style={styles.playerName}>{props.name}</Text>
-          {props.isReady && (
-            <Image source={ImageReady} style={{ width: 20, height: 20 }} />
-          )}
         </View>
-        <Text>{props.points}</Text>
+        <Text style={{ color: "black" }}>{props.points}P</Text>
       </View>
-      <View style={styles.playerType}>
-        <Image
-          source={props.isPlayer1 ? ImageCross : ImageCircle}
-          style={{ width: 20, height: 20 }}
-        />
-      </View>
+      {props.isReady && <Image source={ImageReady} style={styles.ready} />}
+      <Image
+        source={props.isPlayer1 ? ImageCross : ImageCircle}
+        style={styles.playerType}
+      />
       <View style={styles.playerTime}>
         <Text style={styles.playerTimeText}>
           {props.time ? formatSeconds(props.time) : "-"}
@@ -63,15 +59,10 @@ const styles = StyleSheet.create({
   },
   playerType: {
     position: "absolute",
-    borderRightWidth: 2,
-    borderTopWidth: 2,
-    borderTopRightRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 30,
-    width: 30,
-    left: 0,
-    bottom: 0
+    height: 25,
+    width: 25,
+    left: 5,
+    bottom: 5
   },
   playerTime: {
     flexDirection: "row",
@@ -84,5 +75,12 @@ const styles = StyleSheet.create({
   },
   activePlayer: {
     opacity: 1
+  },
+  ready: {
+    position: "absolute",
+    right: 5,
+    bottom: 5,
+    width: 25,
+    height: 25
   }
 });

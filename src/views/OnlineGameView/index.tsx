@@ -264,10 +264,12 @@ class OnlineGameView extends React.Component<Props, State> {
       boardPositions: Array(15)
         .fill(null)
         .map(() => Array(15).fill(null)),
-      opponent: {
-        ...this.state.opponent,
-        playerTime: this.state.timeMode * 60
-      }
+      opponent: this.state.opponent
+        ? {
+            ...this.state.opponent,
+            playerTime: this.state.timeMode * 60
+          }
+        : null
     });
     const { gameId } = this.state;
     if (gameId) {
@@ -308,23 +310,31 @@ class OnlineGameView extends React.Component<Props, State> {
             </View>
           )}
         </View>
-        <TouchableOpacity onPress={() => this.playerReady()}>
-          <Text>READY</Text>
-        </TouchableOpacity>
-        <View style={styles.actionButtons}>
-          <ActionButton
-            label={"redo"}
-            onPress={() => {
-              this.offer("redo");
-            }}
-          />
-          <ActionButton
-            label={"draw"}
-            onPress={() => {
-              this.offer("draw");
-            }}
-          />
-        </View>
+        {this.state.hasTurn === null && (
+          <TouchableOpacity
+            style={[styles.ready, this.state.isReady && styles.readyDisabled]}
+            onPress={() => this.playerReady()}
+            disabled={this.state.isReady}
+          >
+            <Text style={styles.readyLabel}>READY TO PLAY</Text>
+          </TouchableOpacity>
+        )}
+        {this.state.hasTurn !== null && (
+          <View style={styles.actionButtons}>
+            <ActionButton
+              label={"redo"}
+              onPress={() => {
+                this.offer("redo");
+              }}
+            />
+            <ActionButton
+              label={"draw"}
+              onPress={() => {
+                this.offer("draw");
+              }}
+            />
+          </View>
+        )}
         <Board
           boardPositions={this.state.boardPositions}
           makeMove={(position: { x: number; y: number }) =>
@@ -347,8 +357,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1
   },
+  ready: {
+    marginVertical: 5,
+    height: 40,
+    width: 130,
+    borderRadius: 5,
+    backgroundColor: "#8FB9A8",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  readyDisabled: {
+    opacity: 0.2
+  },
+  readyLabel: {
+    color: "black",
+    fontWeight: "600"
+  },
   actionButtons: {
-    marginTop: 15,
+    marginVertical: 5,
     flexDirection: "row"
   },
   loadingIndicator: {

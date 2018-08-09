@@ -38,8 +38,8 @@ export default class GameListView extends React.Component<Props, State> {
       "http://192.168.178.51:3000/gameList"
     );
     this.gameListSocket.once("connect", gameList => {
-      this.setState({gameList});
-    })
+      this.setState({ gameList });
+    });
     this.gameListSocket.on("openGames", gameList => {
       this.setState({ gameList });
     });
@@ -83,7 +83,7 @@ export default class GameListView extends React.Component<Props, State> {
             <Text style={styles.textBold}>
               {game.player1Name.toUpperCase()}
             </Text>
-            <Text style={styles.text}>{game.player1Points}</Text>
+            <Text style={styles.text}>{game.player1Points}P</Text>
           </View>
         </View>
         <TouchableOpacity
