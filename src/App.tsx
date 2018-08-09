@@ -34,5 +34,6 @@ Navigation.startSingleScreenApp({
   screen: {
     screen: "omok.HomeView",
     title: "Welcome"
-  }
+  },
+  animationType: "fade"
 });
