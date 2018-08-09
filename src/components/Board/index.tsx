@@ -20,6 +20,7 @@ const tileSize = screenWidth / 15;
 
 interface Props {
   boardPositions: any[][];
+  disabled?: boolean;
   makeMove: (position: { x: number; y: number }) => void;
 }
 interface State {
@@ -55,7 +56,8 @@ export default class Board extends React.Component<Props, State> {
     // touch gesture logic
     this.panResponder = PanResponder.create({
       // enable drag gestures
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponder: (evt, gestureState) =>
+        this.props.disabled ? false : true,
       // on press gesture
       onPanResponderGrant: (evt, gestureState) => {
         // get cursor coordinates

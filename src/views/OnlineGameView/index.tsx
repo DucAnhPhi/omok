@@ -340,6 +340,7 @@ class OnlineGameView extends React.Component<Props, State> {
           makeMove={(position: { x: number; y: number }) =>
             this.makeMove(position)
           }
+          disabled={!this.state.hasTurn}
         />
       </View>
     );
