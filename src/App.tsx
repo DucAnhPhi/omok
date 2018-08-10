@@ -35,5 +35,8 @@ Navigation.startSingleScreenApp({
     screen: "omok.HomeView",
     title: "Welcome"
   },
-  animationType: "fade"
+  animationType: "fade",
+  appStyle: {
+    orientation: "portrait"
+  }
 });
