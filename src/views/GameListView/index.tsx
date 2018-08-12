@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import firebase from "react-native-firebase";
 import SocketIOClient from "socket.io-client";
 import { IGame } from "../../models";
 
@@ -33,9 +34,13 @@ export default class GameListView extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    const firebaseToken = await firebase.auth().currentUser.getIdToken(true);
     this.gameListSocket = SocketIOClient.connect(
-      "http://192.168.178.51:3000/gameList"
+      "http://192.168.178.137:3000/gameList",
+      {
+        query: { token: firebaseToken }
+      }
     );
     this.gameListSocket.once("connect", gameList => {
       this.setState({ gameList });

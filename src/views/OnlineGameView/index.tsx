@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import firebase from "react-native-firebase";
 import { connect } from "react-redux";
 import SocketIOClient from "socket.io-client";
 import ActionButton from "../../components/ActionButton";
@@ -72,9 +73,15 @@ class OnlineGameView extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { isCreating, isJoining, profile, gameId } = this.props;
-    this.gameSocket = SocketIOClient.connect("http://192.168.178.51:3000/game");
+    const firebaseToken = await firebase.auth().currentUser.getIdToken(true);
+    this.gameSocket = SocketIOClient.connect(
+      "192.168.178.137:3000/game",
+      {
+        query: { token: firebaseToken }
+      }
+    );
     if (isCreating) {
       this.gameSocket.emit("createGame", { user: profile, timeMode: 5 });
     }
