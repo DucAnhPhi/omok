@@ -2,6 +2,7 @@ import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import TouchableDebounce from "../../components/TouchableDebounce";
 import Backend from "../../lib/backend";
 import Logger from "../../lib/logger";
 import { IProfile } from "../../models";
@@ -67,15 +68,15 @@ class HomeView extends React.Component<Props> {
   render() {
     return (
       <View style={styles.home}>
-        <TouchableOpacity
+        <TouchableDebounce
           onPress={() => {
             this.routingAction();
           }}
           style={[styles.button, { backgroundColor: "#8FB9A8" }]}
         >
           <Text style={styles.buttonLabel}>PLAY ONLINE</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </TouchableDebounce>
+        <TouchableDebounce
           onPress={() =>
             this.props.navigator.push({
               screen: "omok.OfflineGameView",
@@ -86,7 +87,7 @@ class HomeView extends React.Component<Props> {
           style={[styles.button, { backgroundColor: "#765D69" }]}
         >
           <Text style={styles.buttonLabel}>2 PLAYERS OFFLINE</Text>
-        </TouchableOpacity>
+        </TouchableDebounce>
         {this.props.authenticated && (
           <TouchableOpacity
             onPress={() => {

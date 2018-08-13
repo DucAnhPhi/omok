@@ -9,6 +9,7 @@ import {
 import firebase from "react-native-firebase";
 import SocketIOClient from "socket.io-client";
 import { URI } from "../../../config";
+import TouchableDebounce from "../../components/TouchableDebounce";
 import { IGame } from "../../models";
 
 interface Props {
@@ -92,12 +93,12 @@ export default class GameListView extends React.Component<Props, State> {
             <Text style={styles.text}>{game.player1Points}P</Text>
           </View>
         </View>
-        <TouchableOpacity
+        <TouchableDebounce
           style={styles.join}
           onPress={() => this.joinGame(game.gameId)}
         >
           <Text style={styles.textBold}>JOIN</Text>
-        </TouchableOpacity>
+        </TouchableDebounce>
       </View>
     );
   }
@@ -107,12 +108,12 @@ export default class GameListView extends React.Component<Props, State> {
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>OPEN GAMES</Text>
-          <TouchableOpacity
+          <TouchableDebounce
             style={styles.button}
             onPress={() => this.createGame()}
           >
             <Text style={styles.buttonLabel}>CREATE GAME</Text>
-          </TouchableOpacity>
+          </TouchableDebounce>
         </View>
         <FlatList
           data={this.state.gameList}
