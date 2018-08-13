@@ -90,7 +90,7 @@ class OnlineGameView extends React.Component<Props, State> {
       this.gameSocket.emit("joinGame", { gameId, user: profile });
     }
 
-    this.gameSocket.on("gameCreated", initialGame => {
+    this.gameSocket.once("gameCreated", initialGame => {
       this.setState({
         isPlayer1: true,
         gameId: initialGame.gameId,
