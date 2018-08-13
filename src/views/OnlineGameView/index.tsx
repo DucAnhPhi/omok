@@ -14,7 +14,7 @@ import { URI } from "../../../config";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
-import { IProfile } from "../../models";
+import { IProfile, Position } from "../../models";
 
 interface Props {
   isCreating?: boolean;
@@ -270,7 +270,7 @@ class OnlineGameView extends React.Component<Props, State> {
     }
   }
 
-  makeMove = (position: { x: number; y: number }) => {
+  makeMove = (position: Position) => {
     console.log("move");
     this.setState({ hasTurn: false });
     this.gameSocket.emit("move", { gameId: this.state.gameId, position });
@@ -371,9 +371,7 @@ class OnlineGameView extends React.Component<Props, State> {
         )}
         <Board
           boardPositions={this.state.boardPositions}
-          makeMove={(position: { x: number; y: number }) =>
-            this.makeMove(position)
-          }
+          makeMove={(position: Position) => this.makeMove(position)}
           gameEndType={this.state.gameEndType}
           disabled={!this.state.hasTurn}
         />

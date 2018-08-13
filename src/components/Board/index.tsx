@@ -8,6 +8,7 @@ import {
   Text,
   View
 } from "react-native";
+import { Position } from "../../models";
 
 const ImageTile = require("./assets/tile.png");
 const ImageTileActive = require("./assets/tile-active.png");
@@ -22,7 +23,7 @@ interface Props {
   boardPositions: any[][];
   disabled?: boolean;
   gameEndType?: "win" | "lose" | "draw";
-  makeMove: (position: { x: number; y: number }) => void;
+  makeMove: (position: Position) => void;
 }
 interface State {
   cursorX: number;

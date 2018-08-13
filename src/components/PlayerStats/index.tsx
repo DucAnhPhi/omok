@@ -8,11 +8,12 @@ const ImageReady = require("./assets/ready.png");
 
 interface Props {
   name: string;
-  points: number;
+  points?: number;
   isPlayer1: boolean;
-  time: number;
+  time?: number;
   hasTurn: boolean;
   isReady?: boolean;
+  offline?: boolean;
 }
 
 export default function PlayerStats(props: Props) {
@@ -22,18 +23,22 @@ export default function PlayerStats(props: Props) {
         <View>
           <Text style={styles.playerName}>{props.name}</Text>
         </View>
-        <Text style={{ color: "black" }}>{props.points}P</Text>
+        {!props.offline && (
+          <Text style={{ color: "black" }}>{props.points}P</Text>
+        )}
       </View>
       {props.isReady && <Image source={ImageReady} style={styles.ready} />}
       <Image
         source={props.isPlayer1 ? ImageCross : ImageCircle}
-        style={styles.playerType}
+        style={[styles.playerType, props.offline && styles.offline]}
       />
-      <View style={styles.playerTime}>
-        <Text style={styles.playerTimeText}>
-          {props.time ? formatSeconds(props.time) : "-"}
-        </Text>
-      </View>
+      {!props.offline && (
+        <View style={styles.playerTime}>
+          <Text style={styles.playerTimeText}>
+            {props.time ? formatSeconds(props.time) : "-"}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -46,6 +51,10 @@ const styles = StyleSheet.create({
     position: "relative",
     borderWidth: 5,
     borderRadius: 5
+  },
+  offline: {
+    left: 0,
+    bottom: 0
   },
   playerHeader: {
     flexDirection: "column",

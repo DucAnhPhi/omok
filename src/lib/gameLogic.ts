@@ -1,4 +1,16 @@
+import { Move } from "../models";
+
 export default class GameLogic {
+  static convertToPositions(moves: Move[]) {
+    const boardPositions = Array(15)
+      .fill(null)
+      .map(() => Array(15).fill(null));
+    moves.map((move: Move) => {
+      boardPositions[move.y][move.x] = move.isPlayer1;
+    });
+    return boardPositions;
+  }
+
   static checkRow(row, col, positions, currentToken) {
     let inALine = 0;
     for (let colOffset = 1; colOffset < 5; colOffset++) {
@@ -52,7 +64,7 @@ export default class GameLogic {
     for (let row = 0; row < positions.length; row++) {
       for (let col = 0; col < positions[row].length; col++) {
         const currentToken = positions[row][col];
-        if (currentToken === undefined) {
+        if (currentToken === null) {
           continue;
         }
         const overBottomLimit = row + 4 > 14;

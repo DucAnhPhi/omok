@@ -1,13 +1,14 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
 import GameLogic from "../../lib/gameLogic";
+import { Move, Position } from "../../models";
 
 interface State {
-  boardPositions: any[][];
-  whiteTurn: boolean;
+  moves: Move[];
+  player1HasTurn: boolean;
 }
 
 export default class OfflineGameView extends React.Component<undefined, State> {
@@ -20,44 +21,79 @@ export default class OfflineGameView extends React.Component<undefined, State> {
   constructor() {
     super(undefined);
     this.state = {
-      boardPositions: [...Array(15)].map(() => [...Array(15)]),
-      whiteTurn: true
+      moves: [],
+      player1HasTurn: true
     };
   }
 
-  makeMove = (position: { x: number; y: number }) => {
-    const newBoardPositions = this.state.boardPositions.slice();
-    // if field already occupied, cancel function
-    if (newBoardPositions[position.y][position.x] !== undefined) {
-      return;
-    }
-    newBoardPositions[position.y][position.x] = this.state.whiteTurn;
+  makeMove = (position: Position) => {
+    const updatedMoves = [
+      ...this.state.moves,
+      { ...position, isPlayer1: this.state.player1HasTurn }
+    ];
     this.setState({
-      boardPositions: newBoardPositions,
-      whiteTurn: !this.state.whiteTurn
+      moves: updatedMoves,
+      player1HasTurn: !this.state.player1HasTurn
     });
     const isVictory = GameLogic.checkVictory(
-      this.state.whiteTurn,
-      this.state.boardPositions
+      this.state.player1HasTurn,
+      GameLogic.convertToPositions(updatedMoves)
     );
     if (isVictory) {
-      alert("win");
+      Alert.alert(
+        "Win",
+        `${this.state.player1HasTurn ? "PLAYER1" : "PLAYER2"} wins!`,
+        [
+          {
+            text: "play again",
+            onPress: () => {
+              this.setState({
+                moves: [],
+                player1HasTurn: true
+              });
+            }
+          }
+        ],
+        { cancelable: false }
+      );
     }
   };
+
+  redo() {
+    this.setState({
+      moves: this.state.moves.slice(0, -1),
+      player1HasTurn: !this.state.player1HasTurn
+    });
+  }
 
   render() {
     return (
       <View style={styles.container}>
-        <PlayerStats />
-        <Board
-          boardPositions={this.state.boardPositions}
-          makeMove={this.makeMove}
-        />
-        <View style={styles.actionButtons}>
-          <ActionButton label={"redo"} />
-          <ActionButton label={"draw"} />
-          <ActionButton label={"give up"} isRed={true} />
+        <View style={styles.players}>
+          <PlayerStats
+            name={"PLAYER1"}
+            hasTurn={this.state.player1HasTurn}
+            isPlayer1={true}
+            offline={true}
+          />
+          <PlayerStats
+            name={"PLAYER2"}
+            hasTurn={this.state.player1HasTurn === false}
+            isPlayer1={false}
+            offline={true}
+          />
         </View>
+        <ActionButton
+          label={"redo"}
+          onPress={() => this.redo()}
+          disabled={this.state.moves.length === 0}
+        />
+        <Board
+          boardPositions={GameLogic.convertToPositions(this.state.moves)}
+          makeMove={(position: { x: number; y: number }) =>
+            this.makeMove(position)
+          }
+        />
       </View>
     );
   }
@@ -68,6 +104,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#FEFAD4",
     alignItems: "center",
     flex: 1
+  },
+  players: {
+    marginBottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between"
   },
   actionButtons: {
     marginTop: 15,

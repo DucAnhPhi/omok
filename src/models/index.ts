@@ -19,3 +19,14 @@ export interface IGame {
   timeMode: number;
   turn: string;
 }
+
+export interface Position {
+  x: number;
+  y: number;
+}
+
+export interface Move {
+  x: number;
+  y: number;
+  isPlayer1: boolean;
+}
