@@ -58,3 +58,4 @@ buck-out/
 .vscode/
 .jest/
 android/app/google-services.json
+config.ts

@@ -10,6 +10,7 @@ import {
 import firebase from "react-native-firebase";
 import { connect } from "react-redux";
 import SocketIOClient from "socket.io-client";
+import { URI } from "../../../config";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
@@ -77,7 +78,7 @@ class OnlineGameView extends React.Component<Props, State> {
     const { isCreating, isJoining, profile, gameId } = this.props;
     const firebaseToken = await firebase.auth().currentUser.getIdToken(true);
     this.gameSocket = SocketIOClient.connect(
-      "192.168.178.137:3000/game",
+      `${URI}/game`,
       {
         query: { token: firebaseToken }
       }

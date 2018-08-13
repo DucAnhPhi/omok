@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import firebase from "react-native-firebase";
 import SocketIOClient from "socket.io-client";
+import { URI } from "../../../config";
 import { IGame } from "../../models";
 
 interface Props {
@@ -37,7 +38,7 @@ export default class GameListView extends React.Component<Props, State> {
   async componentDidMount() {
     const firebaseToken = await firebase.auth().currentUser.getIdToken(true);
     this.gameListSocket = SocketIOClient.connect(
-      "http://192.168.178.137:3000/gameList",
+      `${URI}/gameList`,
       {
         query: { token: firebaseToken }
       }
