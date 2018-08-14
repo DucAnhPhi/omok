@@ -10,6 +10,7 @@ import firebase from "react-native-firebase";
 import SocketIOClient from "socket.io-client";
 import { URI } from "../../../config";
 import TouchableDebounce from "../../components/TouchableDebounce";
+import Backend from "../../lib/backend";
 import { IGame } from "../../models";
 
 interface Props {
@@ -52,9 +53,18 @@ export default class GameListView extends React.Component<Props, State> {
     });
   }
 
-  componentWillUnmount() {
+  async componentWillUnmount() {
     if (this.gameListSocket) {
       this.gameListSocket.close();
+    }
+    if (firebase.auth().currentUser.isAnonymous) {
+      try {
+        Backend.deleteProfile();
+      } catch (e) {
+        console.log(e);
+      } finally {
+        Backend.logout();
+      }
     }
   }
 

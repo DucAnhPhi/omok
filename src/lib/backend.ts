@@ -1,6 +1,6 @@
 import { AccessToken, LoginManager } from "react-native-fbsdk";
 import firebase, { RNFirebase } from "react-native-firebase";
-import { IGame, IProfile } from "../models";
+import { IProfile } from "../models";
 import Logger from "./logger";
 
 const db = firebase.firestore();
@@ -27,6 +27,11 @@ export default class Backend {
       .catch(e => {
         Logger.error("create user failed", e);
       });
+  }
+
+  static deleteProfile(): Promise<any> {
+    const httpsCallable = firebase.functions().httpsCallable("deleteProfile");
+    return httpsCallable();
   }
 
   static loginAsGuest(): Promise<void | RNFirebase.UserCredential> {
