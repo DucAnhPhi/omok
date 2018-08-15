@@ -9,20 +9,24 @@ import {
 } from "react-native";
 import firebase from "react-native-firebase";
 import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import SocketIOClient from "socket.io-client";
 import { URI } from "../../../config";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
-import { IProfile, Position } from "../../models";
+import { IGame, IProfile, Position } from "../../models";
+import { updateProfile } from "../../store/profile";
 
 interface Props {
   isCreating?: boolean;
   isJoining?: boolean;
   gameId?: string;
   profile: IProfile;
+  updateProfile: (profile: IProfile) => void;
 }
 interface State {
+  points: number;
   hasTurn: boolean;
   isPlayer1: boolean;
   playerTime: number;
@@ -56,6 +60,7 @@ class OnlineGameView extends React.Component<Props, State> {
   constructor(props) {
     super(undefined);
     this.state = {
+      points: props.profile.points,
       gameId: props.gameId || null,
       hasTurn: null,
       isPlayer1: false,
@@ -75,7 +80,7 @@ class OnlineGameView extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    const { isCreating, isJoining, profile, gameId } = this.props;
+    const { isCreating, isJoining, gameId } = this.props;
     const firebaseToken = await firebase.auth().currentUser.getIdToken(true);
     this.gameSocket = SocketIOClient.connect(
       `${URI}/game`,
@@ -84,10 +89,10 @@ class OnlineGameView extends React.Component<Props, State> {
       }
     );
     if (isCreating) {
-      this.gameSocket.emit("createGame", { user: profile, timeMode: 5 });
+      this.gameSocket.emit("createGame", { timeMode: 5 });
     }
     if (isJoining) {
-      this.gameSocket.emit("joinGame", { gameId, user: profile });
+      this.gameSocket.emit("joinGame", { gameId });
     }
 
     this.gameSocket.once("gameCreated", initialGame => {
@@ -142,6 +147,10 @@ class OnlineGameView extends React.Component<Props, State> {
     this.gameSocket.on("playerLeft", () => {
       clearInterval(this.timerRef);
       this.setState({
+        points:
+          this.state.hasTurn !== null
+            ? this.state.points + 50
+            : this.state.points,
         opponent: null,
         isPlayer1: true,
         hasTurn: null,
@@ -164,7 +173,11 @@ class OnlineGameView extends React.Component<Props, State> {
 
     this.gameSocket.on(
       "gameEnded",
-      (params: { victory?: { isPlayer1: boolean }; draw?: boolean }) => {
+      (params: {
+        victory?: { isPlayer1: boolean };
+        draw?: boolean;
+        updatedGame: IGame;
+      }) => {
         clearInterval(this.timerRef);
         let gameEndType;
         if (params.draw) {
@@ -175,12 +188,27 @@ class OnlineGameView extends React.Component<Props, State> {
             params.victory.isPlayer1 === this.state.isPlayer1 ? "win" : "lose";
         }
         this.setState({
+          points: this.state.isPlayer1
+            ? params.updatedGame.player1Points
+            : params.updatedGame.player2Points,
+          opponent: {
+            ...this.state.opponent,
+            points: this.state.isPlayer1
+              ? params.updatedGame.player2Points
+              : params.updatedGame.player1Points
+          },
           hasTurn: null,
           rejectedDraw: false,
           rejectedRedo: false,
           requestedDraw: false,
           requestedRedo: false,
           gameEndType
+        });
+        this.props.updateProfile({
+          username: this.props.profile.username,
+          points: this.state.isPlayer1
+            ? params.updatedGame.player1Points
+            : params.updatedGame.player2Points
         });
       }
     );
@@ -319,7 +347,7 @@ class OnlineGameView extends React.Component<Props, State> {
         <View style={styles.players}>
           <PlayerStats
             name={this.props.profile.username}
-            points={this.props.profile.points}
+            points={this.state.points}
             time={this.state.playerTime}
             hasTurn={this.state.hasTurn}
             isPlayer1={this.state.isPlayer1}
@@ -433,4 +461,10 @@ const mapStateToProps = (state: any) => ({
   profile: state.profileReducer.profile
 });
 
-export default connect(mapStateToProps)(OnlineGameView);
+const mapDispatchToProps = (dispatch: any) =>
+  bindActionCreators({ updateProfile }, dispatch);
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(OnlineGameView);

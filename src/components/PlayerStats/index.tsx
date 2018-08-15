@@ -21,7 +21,7 @@ export default function PlayerStats(props: Props) {
     <View style={[styles.playerCard, props.hasTurn && styles.activePlayer]}>
       <View style={styles.playerHeader}>
         <View>
-          <Text style={styles.playerName}>{props.name}</Text>
+          <Text style={styles.playerName}>{props.name.toUpperCase()}</Text>
         </View>
         {!props.offline && (
           <Text style={{ color: "black" }}>{props.points}P</Text>
