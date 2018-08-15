@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -68,12 +69,25 @@ export default class GameListView extends React.Component<Props, State> {
     }
   }
 
-  createGame() {
+  handleCreateGame() {
+    Alert.alert("Create game", "Please choose the time mode:", [
+      {
+        text: "1 minute",
+        onPress: () => this.createGame(1)
+      },
+      {
+        text: "5 minutes",
+        onPress: () => this.createGame(5)
+      }
+    ]);
+  }
+
+  createGame(timeMode: number) {
     this.props.navigator.push({
       screen: "omok.OnlineGameView",
       animated: true,
       passProps: {
-        isCreating: true
+        isCreating: { timeMode }
       }
     });
   }
@@ -120,7 +134,7 @@ export default class GameListView extends React.Component<Props, State> {
           <Text style={styles.title}>OPEN GAMES</Text>
           <TouchableDebounce
             style={styles.button}
-            onPress={() => this.createGame()}
+            onPress={() => this.handleCreateGame()}
           >
             <Text style={styles.buttonLabel}>CREATE GAME</Text>
           </TouchableDebounce>

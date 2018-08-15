@@ -19,7 +19,7 @@ import { IGame, IProfile, Position } from "../../models";
 import { updateProfile } from "../../store/profile";
 
 interface Props {
-  isCreating?: boolean;
+  isCreating?: { timeMode: number };
   isJoining?: boolean;
   gameId?: string;
   profile: IProfile;
@@ -89,7 +89,7 @@ class OnlineGameView extends React.Component<Props, State> {
       }
     );
     if (isCreating) {
-      this.gameSocket.emit("createGame", { timeMode: 5 });
+      this.gameSocket.emit("createGame", { timeMode: isCreating.timeMode });
     }
     if (isJoining) {
       this.gameSocket.emit("joinGame", { gameId });
@@ -165,7 +165,6 @@ class OnlineGameView extends React.Component<Props, State> {
     });
 
     this.gameSocket.on("updateBoard", boardPositions => {
-      console.log(boardPositions);
       this.setState({
         boardPositions
       });
