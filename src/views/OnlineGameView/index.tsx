@@ -117,17 +117,6 @@ class OnlineGameView extends React.Component<Props, State> {
       });
     });
 
-    this.gameSocket.on("gameStarted", () => {
-      this.setState({
-        hasTurn: this.state.isPlayer1,
-        isReady: false,
-        opponent: {
-          ...this.state.opponent,
-          isReady: false
-        }
-      });
-    });
-
     this.gameSocket.on("playerLeft", () => {
       clearInterval(this.timerRef);
       this.setState({
@@ -198,34 +187,15 @@ class OnlineGameView extends React.Component<Props, State> {
 
     this.gameSocket.on("turn", () => {
       this.setState({
-        hasTurn: true,
         rejectedDraw: false,
         rejectedRedo: false,
         requestedDraw: false,
         requestedRedo: false
       });
       this.timerRef = setInterval(() => {
-        this.gameSocket.emit("tick", { gameId: this.state.gameId });
+        this.gameSocket.emit("tick", { gameId: this.state.game.gameId });
       }, 1000);
     });
-
-    this.gameSocket.on(
-      "timeUpdated",
-      (params: { playerTime: number; isPlayer1: boolean }) => {
-        if (params.isPlayer1 === this.state.isPlayer1) {
-          this.setState({
-            playerTime: params.playerTime
-          });
-        } else {
-          this.setState({
-            opponent: {
-              ...this.state.opponent,
-              playerTime: params.playerTime
-            }
-          });
-        }
-      }
-    );
 
     this.gameSocket.on("offer", (type: "redo" | "draw") => {
       if (
