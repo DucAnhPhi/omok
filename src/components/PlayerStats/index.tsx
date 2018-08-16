@@ -8,7 +8,7 @@ const ImageReady = require("./assets/ready.png");
 
 interface Props {
   name: string;
-  points?: number;
+  points?: string;
   isPlayer1: boolean;
   time?: number;
   hasTurn: boolean;
@@ -18,27 +18,35 @@ interface Props {
 
 export default function PlayerStats(props: Props) {
   return (
-    <View style={[styles.playerCard, props.hasTurn && styles.activePlayer]}>
+    <View
+      style={[
+        styles.playerCard,
+        props.hasTurn && styles.activePlayer,
+        !props.offline && { height: 75 }
+      ]}
+    >
       <View style={styles.playerHeader}>
         <View>
           <Text style={styles.playerName}>{props.name.toUpperCase()}</Text>
         </View>
-        {!props.offline && (
-          <Text style={{ color: "black" }}>{props.points}P</Text>
-        )}
+        {!props.offline &&
+          props.points.length !== 0 && (
+            <Text style={{ color: "black" }}>{props.points}P</Text>
+          )}
       </View>
       {props.isReady && <Image source={ImageReady} style={styles.ready} />}
       <Image
         source={props.isPlayer1 ? ImageCross : ImageCircle}
         style={[styles.playerType, props.offline && styles.offline]}
       />
-      {!props.offline && (
-        <View style={styles.playerTime}>
-          <Text style={styles.playerTimeText}>
-            {props.time ? formatSeconds(props.time) : "-"}
-          </Text>
-        </View>
-      )}
+      {!props.offline &&
+        props.time && (
+          <View style={styles.playerTime}>
+            <Text style={styles.playerTimeText}>
+              {formatSeconds(props.time)}
+            </Text>
+          </View>
+        )}
     </View>
   );
 }
