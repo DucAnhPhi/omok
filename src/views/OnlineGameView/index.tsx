@@ -15,6 +15,7 @@ import { URI } from "../../../config";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
+import GameLogic from "../../lib/gameLogic";
 import { minutesToSeconds, secondsStringToNumber } from "../../lib/time";
 import {
   IGame,
@@ -107,15 +108,22 @@ class OnlineGameView extends React.Component<Props, State> {
       this.gameSocket.emit("joinGame", { gameId });
     }
 
-    this.gameSocket.on("updateGame", (gameProps: IGameOptional) => {
-      const updatedGame: IGame = { ...this.state.game };
-      Object.keys(gameProps).map(key => {
-        updatedGame[key] = gameProps[key];
-      });
-      this.setState({
-        game: updatedGame
-      });
-    });
+    this.gameSocket.on(
+      "updateGame",
+      (params: { gameProps?: IGameOptional; moves?: string[] }) => {
+        const updatedGame: IGame = { ...this.state.game };
+        if (params.gameProps) {
+          Object.keys(params.gameProps).map(key => {
+            updatedGame[key] = params.gameProps[key];
+          });
+        }
+        console.log(params.moves);
+        this.setState({
+          game: updatedGame,
+          moves: params.moves ? params.moves : this.state.moves
+        });
+      }
+    );
 
     this.gameSocket.on("playerLeft", () => {
       clearInterval(this.timerRef);
@@ -134,12 +142,6 @@ class OnlineGameView extends React.Component<Props, State> {
         requestedRedo: false,
         playerTime: this.state.timeMode * 60,
         gameEndType: this.state.hasTurn === null ? null : "win"
-      });
-    });
-
-    this.gameSocket.on("updateBoard", boardPositions => {
-      this.setState({
-        boardPositions
       });
     });
 
@@ -187,6 +189,10 @@ class OnlineGameView extends React.Component<Props, State> {
 
     this.gameSocket.on("turn", () => {
       this.setState({
+        game: {
+          ...this.state.game,
+          player1HasTurn: this.state.isPlayer1 ? "true" : "false"
+        },
         rejectedDraw: false,
         rejectedRedo: false,
         requestedDraw: false,
@@ -252,9 +258,13 @@ class OnlineGameView extends React.Component<Props, State> {
   }
 
   makeMove = (position: Position) => {
-    console.log("move");
-    this.setState({ hasTurn: false });
-    this.gameSocket.emit("move", { gameId: this.state.gameId, position });
+    this.setState({
+      game: {
+        ...this.state.game,
+        player1HasTurn: this.state.isPlayer1 ? "false" : "true"
+      }
+    });
+    this.gameSocket.emit("move", { gameId: this.state.game.gameId, position });
     clearInterval(this.timerRef);
   };
 
@@ -315,7 +325,8 @@ class OnlineGameView extends React.Component<Props, State> {
             points={game[`player${opponentKey}Points`]}
             time={secondsStringToNumber(game[`player${opponentKey}Time`])}
             hasTurn={
-              !(game.player1HasTurn === "true" && isPlayer1) &&
+              !(game.player1HasTurn === "true") &&
+              isPlayer1 &&
               game.playing === "true"
             }
             isPlayer1={!isPlayer1}
@@ -333,7 +344,7 @@ class OnlineGameView extends React.Component<Props, State> {
   }
 
   render() {
-    const { isPlayer1, game } = this.state;
+    const { isPlayer1, game, moves } = this.state;
     const currentKey = isPlayer1 ? "1" : "2";
     return (
       <View style={styles.container}>
@@ -370,10 +381,10 @@ class OnlineGameView extends React.Component<Props, State> {
           </View>
         )}
         <Board
-          boardPositions={this.state.boardPositions}
+          boardPositions={GameLogic.convertStringsToPositions(moves)}
           makeMove={(position: Position) => this.makeMove(position)}
           gameEndType={this.state.gameEndType}
-          disabled={!(game.player1HasTurn === "true" && isPlayer1)}
+          disabled={!(game.player1HasTurn === "true") && isPlayer1}
         />
       </View>
     );

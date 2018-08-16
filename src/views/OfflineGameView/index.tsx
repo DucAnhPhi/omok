@@ -37,7 +37,7 @@ export default class OfflineGameView extends React.Component<undefined, State> {
     });
     const isVictory = GameLogic.checkVictory(
       this.state.player1HasTurn,
-      GameLogic.convertToPositions(updatedMoves)
+      GameLogic.convertMovesToPositions(updatedMoves)
     );
     if (isVictory) {
       Alert.alert(
@@ -89,7 +89,7 @@ export default class OfflineGameView extends React.Component<undefined, State> {
           disabled={this.state.moves.length === 0}
         />
         <Board
-          boardPositions={GameLogic.convertToPositions(this.state.moves)}
+          boardPositions={GameLogic.convertMovesToPositions(this.state.moves)}
           makeMove={(position: { x: number; y: number }) =>
             this.makeMove(position)
           }
