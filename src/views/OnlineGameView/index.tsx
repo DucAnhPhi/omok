@@ -15,7 +15,7 @@ import { URI } from "../../../config";
 import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
-import { stringToSeconds } from "../../lib/time";
+import { minutesToSeconds, secondsStringToNumber } from "../../lib/time";
 import {
   IGame,
   IGameOptional,
@@ -34,6 +34,7 @@ interface Props {
 }
 interface State {
   game: IGame;
+  moves: string[];
   points: number;
   hasTurn: boolean;
   isPlayer1: boolean;
@@ -68,6 +69,7 @@ class OnlineGameView extends React.Component<Props, State> {
   constructor(props) {
     super(undefined);
     this.state = {
+      moves: [],
       game: { ...InitialGame },
       points: props.profile.points,
       gameId: props.gameId || null,
@@ -112,15 +114,6 @@ class OnlineGameView extends React.Component<Props, State> {
       });
       this.setState({
         game: updatedGame
-      });
-    });
-
-    this.gameSocket.on("playerReady", () => {
-      this.setState({
-        opponent: {
-          ...this.state.opponent,
-          isReady: true
-        }
       });
     });
 
@@ -296,24 +289,21 @@ class OnlineGameView extends React.Component<Props, State> {
   };
 
   playerReady() {
+    const { isPlayer1, game } = this.state;
     // clear board and timers and set current player ready
     this.setState({
-      isReady: true,
-      playerTime: this.state.timeMode * 60,
-      boardPositions: Array(15)
-        .fill(null)
-        .map(() => Array(15).fill(null)),
-      opponent: this.state.opponent
-        ? {
-            ...this.state.opponent,
-            playerTime: this.state.timeMode * 60
-          }
-        : null,
+      game: {
+        ...game,
+        player1Ready: isPlayer1 ? "true" : game.player1Ready,
+        player2Ready: !isPlayer1 ? "true" : game.player2Ready,
+        player1Time: minutesToSeconds(game.timeMode),
+        player2Time: minutesToSeconds(game.timeMode)
+      },
+      moves: [],
       gameEndType: null
     });
-    const { gameId } = this.state;
-    if (gameId) {
-      this.gameSocket.emit("playerReady", { gameId });
+    if (game.gameId) {
+      this.gameSocket.emit("playerReady", { gameId: game.gameId });
     }
   }
 
@@ -340,7 +330,7 @@ class OnlineGameView extends React.Component<Props, State> {
         <PlayerStats
           name={this.props.profile.username}
           points={game[`player${currentKey}Points`]}
-          time={stringToSeconds(game[`player${currentKey}Time`])}
+          time={secondsStringToNumber(game[`player${currentKey}Time`])}
           hasTurn={
             game.player1HasTurn === "true" &&
             isPlayer1 &&
@@ -353,7 +343,7 @@ class OnlineGameView extends React.Component<Props, State> {
           <PlayerStats
             name={game[`player${opponentKey}Name`]}
             points={game[`player${opponentKey}Points`]}
-            time={stringToSeconds(game[`player${opponentKey}Time`])}
+            time={secondsStringToNumber(game[`player${opponentKey}Time`])}
             hasTurn={
               !(game.player1HasTurn === "true" && isPlayer1) &&
               game.playing === "true"
@@ -375,15 +365,18 @@ class OnlineGameView extends React.Component<Props, State> {
   render() {
     const { isPlayer1, game } = this.state;
     const currentKey = isPlayer1 ? "1" : "2";
-    const opponentKey = isPlayer1 ? "2" : "1";
     return (
       <View style={styles.container}>
         {this.renderPlayers()}
         {game.playing === "false" && (
           <TouchableOpacity
-            style={[styles.ready, this.state.isReady && styles.readyDisabled]}
+            style={[
+              styles.ready,
+              game[`player${currentKey}Ready`] === "true" &&
+                styles.readyDisabled
+            ]}
             onPress={() => this.playerReady()}
-            disabled={this.state.isReady}
+            disabled={game[`player${currentKey}Ready`] === "true"}
           >
             <Text style={styles.readyLabel}>READY TO PLAY</Text>
           </TouchableOpacity>
