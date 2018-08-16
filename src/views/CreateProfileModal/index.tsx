@@ -20,6 +20,8 @@ interface Props {
 interface State {
   username: string;
   loading: boolean;
+  invalid: boolean;
+  errorMsg: string;
 }
 
 class CreateProfileModal extends React.Component<Props, State> {
@@ -31,7 +33,9 @@ class CreateProfileModal extends React.Component<Props, State> {
     super(undefined);
     this.state = {
       username: "",
-      loading: false
+      loading: false,
+      invalid: true,
+      errorMsg: ""
     };
   }
 
@@ -50,6 +54,35 @@ class CreateProfileModal extends React.Component<Props, State> {
     }
   }
 
+  checkValidUsername(username: string) {
+    if (username.length < 3) {
+      this.setState({
+        invalid: true,
+        errorMsg: "Your username must have at least 3 characters."
+      });
+    } else {
+      let code: number;
+      for (let i = 0; i < username.length; i++) {
+        code = username.charCodeAt(i);
+        if (
+          !(code > 47 && code < 58) && // numeric (0-9)
+          !(code > 64 && code < 91) && // upper alpha (A-Z)
+          !(code > 96 && code < 123) // lower alpha (a-z)
+        ) {
+          this.setState({
+            invalid: true,
+            errorMsg: "Your username must contain only letters and numbers"
+          });
+          return;
+        }
+      }
+      this.setState({
+        invalid: false,
+        errorMsg: ""
+      });
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -60,16 +93,21 @@ class CreateProfileModal extends React.Component<Props, State> {
         )}
         <CustomInput
           onChangeText={(username: string) => {
+            this.checkValidUsername(username);
             this.setState({ username });
           }}
           value={this.state.username}
           placeholder={"Choose your username (max. 10 characters)"}
         />
+        {this.state.errorMsg.length !== 0 && (
+          <Text style={styles.errorMsg}>{this.state.errorMsg}</Text>
+        )}
         <TouchableOpacity
           onPress={() => {
             this.createProfile();
           }}
-          style={styles.button}
+          disabled={this.state.invalid}
+          style={[styles.button, this.state.invalid && styles.disabled]}
         >
           <Text style={styles.buttonLabel}>SUBMIT</Text>
         </TouchableOpacity>
@@ -85,6 +123,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
+  errorMsg: {
+    color: "red",
+    paddingHorizontal: 10,
+    width: 320
+  },
   button: {
     margin: 10,
     height: 50,
@@ -92,6 +135,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#FCD0BA",
     justifyContent: "center"
+  },
+  disabled: {
+    opacity: 0.2
   },
   buttonLabel: {
     color: "black",
