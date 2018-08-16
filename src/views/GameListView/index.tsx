@@ -59,13 +59,9 @@ export default class GameListView extends React.Component<Props, State> {
       this.gameListSocket.close();
     }
     if (firebase.auth().currentUser.isAnonymous) {
-      try {
-        Backend.deleteProfile();
-      } catch (e) {
-        console.log(e);
-      } finally {
-        Backend.logout();
-      }
+      Backend.deleteProfile()
+        .then(() => Backend.logout())
+        .catch(e => console.log(e));
     }
   }
 
