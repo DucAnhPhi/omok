@@ -345,7 +345,9 @@ class OnlineGameView extends React.Component<Props, State> {
               onPress={() => {
                 this.offer("draw");
               }}
-              disabled={this.state.requestedDraw}
+              disabled={
+                this.state.requestedDraw || this.state.moves.length < 20
+              }
             />
           </View>
         )}
