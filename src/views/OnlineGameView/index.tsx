@@ -36,20 +36,7 @@ interface Props {
 interface State {
   game: IGame;
   moves: string[];
-  points: number;
-  hasTurn: boolean;
   isPlayer1: boolean;
-  playerTime: number;
-  timeMode: number;
-  opponent: {
-    name: string;
-    points: number;
-    playerTime: number;
-    isReady: boolean;
-  };
-  gameId: string;
-  isReady: boolean;
-  boardPositions: any[];
   rejectedDraw: boolean;
   rejectedRedo: boolean;
   requestedDraw: boolean;
@@ -72,17 +59,7 @@ class OnlineGameView extends React.Component<Props, State> {
     this.state = {
       moves: [],
       game: { ...InitialGame },
-      points: props.profile.points,
-      gameId: props.gameId || null,
-      hasTurn: null,
       isPlayer1: false,
-      playerTime: null,
-      timeMode: null,
-      opponent: null,
-      isReady: false,
-      boardPositions: Array(15)
-        .fill(null)
-        .map(() => Array(15).fill(null)),
       rejectedDraw: false,
       rejectedRedo: false,
       requestedDraw: false,
@@ -125,32 +102,32 @@ class OnlineGameView extends React.Component<Props, State> {
       }
     );
 
-    this.gameSocket.on("playerLeft", () => {
-      clearInterval(this.timerRef);
-      this.setState({
-        points:
-          this.state.hasTurn !== null
-            ? this.state.points + 50
-            : this.state.points,
-        opponent: null,
-        isPlayer1: true,
-        hasTurn: null,
-        isReady: false,
-        rejectedDraw: false,
-        rejectedRedo: false,
-        requestedDraw: false,
-        requestedRedo: false,
-        playerTime: this.state.timeMode * 60,
-        gameEndType: this.state.hasTurn === null ? null : "win"
-      });
-    });
+    // this.gameSocket.on("playerLeft", () => {
+    //   clearInterval(this.timerRef);
+    //   this.setState({
+    //     points:
+    //       this.state.hasTurn !== null
+    //         ? this.state.points + 50
+    //         : this.state.points,
+    //     opponent: null,
+    //     isPlayer1: true,
+    //     hasTurn: null,
+    //     isReady: false,
+    //     rejectedDraw: false,
+    //     rejectedRedo: false,
+    //     requestedDraw: false,
+    //     requestedRedo: false,
+    //     playerTime: this.state.timeMode * 60,
+    //     gameEndType: this.state.hasTurn === null ? null : "win"
+    //   });
+    // });
 
     this.gameSocket.on(
       "gameEnded",
       (params: {
         victory?: { isPlayer1: boolean };
         draw?: boolean;
-        updatedGame: any;
+        updatedGame: IGame;
       }) => {
         clearInterval(this.timerRef);
         let gameEndType;
@@ -162,28 +139,19 @@ class OnlineGameView extends React.Component<Props, State> {
             params.victory.isPlayer1 === this.state.isPlayer1 ? "win" : "lose";
         }
         this.setState({
-          points: this.state.isPlayer1
-            ? params.updatedGame.player1Points
-            : params.updatedGame.player2Points,
-          opponent: {
-            ...this.state.opponent,
-            points: this.state.isPlayer1
-              ? params.updatedGame.player2Points
-              : params.updatedGame.player1Points
-          },
-          hasTurn: null,
+          game: params.updatedGame,
           rejectedDraw: false,
           rejectedRedo: false,
           requestedDraw: false,
           requestedRedo: false,
           gameEndType
         });
-        this.props.updateProfile({
-          username: this.props.profile.username,
-          points: this.state.isPlayer1
-            ? params.updatedGame.player1Points
-            : params.updatedGame.player2Points
-        });
+        // this.props.updateProfile({
+        //   username: this.props.profile.username,
+        //   points: this.state.isPlayer1
+        //     ? params.updatedGame.player1Points
+        //     : params.updatedGame.player2Points
+        // });
       }
     );
 
@@ -210,17 +178,18 @@ class OnlineGameView extends React.Component<Props, State> {
       ) {
         return;
       }
+      const opponentName = this.state.isPlayer1
+        ? this.state.game.player2Name
+        : this.state.game.player1Name;
       let alertTitle;
       let alertMessage;
       if (type === "redo") {
         alertTitle = "Redo Request";
-        alertMessage = `${
-          this.state.opponent.name
-        } requests to redo the recent move.`;
+        alertMessage = `${opponentName} requests to redo the recent move.`;
       }
       if (type === "draw") {
         alertTitle = "Draw Offer";
-        alertMessage = `${this.state.opponent.name} offers a draw.`;
+        alertMessage = `${opponentName} offers a draw.`;
       }
       Alert.alert(alertTitle, alertMessage, [
         {
@@ -240,10 +209,15 @@ class OnlineGameView extends React.Component<Props, State> {
           onPress: () => {
             clearInterval(this.timerRef);
             this.gameSocket.emit("offerAccepted", {
-              gameId: this.state.gameId,
+              gameId: this.state.game.gameId,
               type
             });
-            this.setState({ hasTurn: false });
+            this.setState({
+              game: {
+                ...this.state.game,
+                player1HasTurn: this.state.isPlayer1 ? "false" : "true"
+              }
+            });
           }
         }
       ]);
@@ -312,8 +286,7 @@ class OnlineGameView extends React.Component<Props, State> {
           points={game[`player${currentKey}Points`]}
           time={secondsStringToNumber(game[`player${currentKey}Time`])}
           hasTurn={
-            game.player1HasTurn === "true" &&
-            isPlayer1 &&
+            (game.player1HasTurn === "true") === isPlayer1 &&
             game.playing === "true"
           }
           isPlayer1={isPlayer1}
@@ -325,8 +298,7 @@ class OnlineGameView extends React.Component<Props, State> {
             points={game[`player${opponentKey}Points`]}
             time={secondsStringToNumber(game[`player${opponentKey}Time`])}
             hasTurn={
-              !(game.player1HasTurn === "true") &&
-              isPlayer1 &&
+              !(game.player1HasTurn === "true") === isPlayer1 &&
               game.playing === "true"
             }
             isPlayer1={!isPlayer1}
@@ -369,7 +341,10 @@ class OnlineGameView extends React.Component<Props, State> {
               onPress={() => {
                 this.offer("redo");
               }}
-              disabled={this.state.hasTurn || this.state.requestedRedo}
+              disabled={
+                (game.player1HasTurn === "true") === isPlayer1 ||
+                this.state.requestedRedo
+              }
             />
             <ActionButton
               label={"draw"}
@@ -384,7 +359,10 @@ class OnlineGameView extends React.Component<Props, State> {
           boardPositions={GameLogic.convertStringsToPositions(moves)}
           makeMove={(position: Position) => this.makeMove(position)}
           gameEndType={this.state.gameEndType}
-          disabled={!(game.player1HasTurn === "true") && isPlayer1}
+          disabled={
+            !(game.player1HasTurn === "true") === isPlayer1 &&
+            game.playing === "false"
+          }
         />
       </View>
     );
