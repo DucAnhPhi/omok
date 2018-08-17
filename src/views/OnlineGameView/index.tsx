@@ -337,7 +337,9 @@ class OnlineGameView extends React.Component<Props, State> {
                 this.offer("redo");
               }}
               disabled={
-                game.player1HasTurn === isPlayer1 || this.state.requestedRedo
+                this.state.moves.length === 0 ||
+                game.player1HasTurn === isPlayer1 ||
+                this.state.requestedRedo
               }
             />
             <ActionButton
