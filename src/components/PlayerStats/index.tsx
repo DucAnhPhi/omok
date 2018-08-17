@@ -40,7 +40,7 @@ export default function PlayerStats(props: Props) {
         style={[styles.playerType, props.offline && styles.offline]}
       />
       {!props.offline &&
-        props.time && (
+        props.time !== undefined && (
           <View style={styles.playerTime}>
             <Text style={styles.playerTimeText}>
               {formatSeconds(props.time)}
