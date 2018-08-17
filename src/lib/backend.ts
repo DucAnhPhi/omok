@@ -29,11 +29,6 @@ export default class Backend {
       });
   }
 
-  static deleteProfile(): Promise<any> {
-    const httpsCallable = firebase.functions().httpsCallable("deleteProfile");
-    return httpsCallable();
-  }
-
   static loginAsGuest(): Promise<void | RNFirebase.UserCredential> {
     return firebase
       .auth()
