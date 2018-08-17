@@ -1,22 +1,11 @@
-import { Move } from "../models";
+import { IMove } from "../models";
 
 export default class GameLogic {
-  static convertMovesToPositions(moves: Move[]) {
+  static convertMovesToPositions(moves: IMove[]) {
     const boardPositions = Array(15)
       .fill(null)
       .map(() => Array(15).fill(null));
-    moves.map((move: Move) => {
-      boardPositions[move.y][move.x] = move.isPlayer1;
-    });
-    return boardPositions;
-  }
-
-  static convertStringsToPositions(moves: string[]) {
-    const boardPositions = Array(15)
-      .fill(null)
-      .map(() => Array(15).fill(null));
-    moves.map((moveStr: string) => {
-      const move: Move = JSON.parse(moveStr);
+    moves.map((move: IMove) => {
       boardPositions[move.y][move.x] = move.isPlayer1;
     });
     return boardPositions;

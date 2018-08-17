@@ -4,10 +4,10 @@ import ActionButton from "../../components/ActionButton";
 import Board from "../../components/Board";
 import PlayerStats from "../../components/PlayerStats";
 import GameLogic from "../../lib/gameLogic";
-import { Move, Position } from "../../models";
+import { IMove, IPosition } from "../../models";
 
 interface State {
-  moves: Move[];
+  moves: IMove[];
   player1HasTurn: boolean;
 }
 
@@ -26,7 +26,7 @@ export default class OfflineGameView extends React.Component<undefined, State> {
     };
   }
 
-  makeMove = (position: Position) => {
+  makeMove = (position: IPosition) => {
     const updatedMoves = [
       ...this.state.moves,
       { ...position, isPlayer1: this.state.player1HasTurn }
