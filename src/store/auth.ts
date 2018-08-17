@@ -19,16 +19,3 @@ export const authReducer = (
       return state;
   }
 };
-
-// ACTION
-export const loginSuccess = () => {
-  return (dispatch: any) => {
-    dispatch({ type: USER_AUTHED });
-  };
-};
-
-export const logoutSuccess = () => {
-  return (dispatch: any) => {
-    dispatch({ type: USER_UNAUTHED });
-  };
-};

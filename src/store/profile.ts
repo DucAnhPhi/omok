@@ -28,9 +28,3 @@ export const updateProfile = (profile: IProfile) => {
     dispatch({ type: PROFILE_UPDATED, payload: { profile } });
   };
 };
-
-export const clearProfile = () => {
-  return (dispatch: any) => {
-    dispatch({ type: PROFILE_CLEARED });
-  };
-};

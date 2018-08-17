@@ -1,18 +1,15 @@
 import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
 import TouchableDebounce from "../../components/TouchableDebounce";
 import Backend from "../../lib/backend";
 import Logger from "../../lib/logger";
 import { IProfile } from "../../models";
-import { clearProfile } from "../../store/profile";
 
 interface Props {
   navigator: any;
   profile: IProfile;
   authenticated: boolean;
-  clearProfile: () => void;
 }
 
 class HomeView extends React.Component<Props> {
@@ -52,9 +49,7 @@ class HomeView extends React.Component<Props> {
       {
         text: "ok",
         onPress: () => {
-          Backend.logout().then(() => {
-            this.props.clearProfile();
-          });
+          Backend.logout();
         }
       },
       {
@@ -135,10 +130,4 @@ const mapStateToProps = (state: any) => ({
   authenticated: state.authReducer.authenticated
 });
 
-const mapDispatchToProps = (dispatch: any) =>
-  bindActionCreators({ clearProfile }, dispatch);
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(HomeView);
+export default connect(mapStateToProps)(HomeView);

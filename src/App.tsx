@@ -24,6 +24,7 @@ persistStore(store, undefined, () => {
     } else {
       // User is signed out
       store.dispatch({ type: "USER_UNAUTHED" });
+      store.dispatch({ type: "PROFILE_CLEARED" });
     }
   });
 });
