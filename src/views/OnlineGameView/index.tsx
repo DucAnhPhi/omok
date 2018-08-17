@@ -102,25 +102,33 @@ class OnlineGameView extends React.Component<Props, State> {
       }
     );
 
-    // this.gameSocket.on("playerLeft", () => {
-    //   clearInterval(this.timerRef);
-    //   this.setState({
-    //     points:
-    //       this.state.hasTurn !== null
-    //         ? this.state.points + 50
-    //         : this.state.points,
-    //     opponent: null,
-    //     isPlayer1: true,
-    //     hasTurn: null,
-    //     isReady: false,
-    //     rejectedDraw: false,
-    //     rejectedRedo: false,
-    //     requestedDraw: false,
-    //     requestedRedo: false,
-    //     playerTime: this.state.timeMode * 60,
-    //     gameEndType: this.state.hasTurn === null ? null : "win"
-    //   });
-    // });
+    this.gameSocket.on("playerLeft", () => {
+      clearInterval(this.timerRef);
+      // set whoever is left as player1 and clear state
+      // update points if necessary
+      const { isPlayer1, game } = this.state;
+      const currentKey = isPlayer1 ? "1" : "2";
+      const updatedGame = {
+        ...InitialGame,
+        player1: game[`player${currentKey}`],
+        player1Uid: game[`player${currentKey}Uid`],
+        player1Name: game[`player${currentKey}Name`],
+        player1Points:
+          game.playing === "true"
+            ? String(parseInt(game[`player${currentKey}Points`], 10) + 50)
+            : game[`player${currentKey}Points`],
+        player1Time: minutesToSeconds(game.timeMode)
+      };
+      this.setState({
+        game: updatedGame,
+        isPlayer1: true,
+        rejectedDraw: false,
+        rejectedRedo: false,
+        requestedDraw: false,
+        requestedRedo: false,
+        gameEndType: game.playing === "true" ? "win" : null
+      });
+    });
 
     this.gameSocket.on(
       "gameEnded",
@@ -272,11 +280,12 @@ class OnlineGameView extends React.Component<Props, State> {
         requestedRedo: true
       });
     }
-    this.gameSocket.emit("offer", { gameId: this.state.gameId, type });
+    this.gameSocket.emit("offer", { gameId: this.state.game.gameId, type });
   }
 
   renderPlayers() {
     const { isPlayer1, game } = this.state;
+    console.log(game);
     const currentKey = isPlayer1 ? "1" : "2";
     const opponentKey = isPlayer1 ? "2" : "1";
     return (
