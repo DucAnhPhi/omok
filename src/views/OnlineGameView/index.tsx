@@ -223,6 +223,8 @@ class OnlineGameView extends React.Component<Props, State> {
         }
       ]);
     });
+
+    this.gameSocket.on("error", e => console.log("socket error: ", e));
   }
 
   componentWillUnmount() {

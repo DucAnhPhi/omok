@@ -52,6 +52,9 @@ export default class GameListView extends React.Component<Props, State> {
     this.gameListSocket.on("openGames", gameList => {
       this.setState({ gameList });
     });
+    this.gameListSocket.on("error", error =>
+      console.log("socket error:", error)
+    );
   }
 
   async componentWillUnmount() {
