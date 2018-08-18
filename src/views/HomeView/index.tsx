@@ -63,6 +63,10 @@ class HomeView extends React.Component<Props> {
   render() {
     return (
       <View style={styles.home}>
+        <Text style={styles.rules}>
+          The winner is the first player to get an unbroken row of 5 stones
+          horizontally, vertically or diagonally.
+        </Text>
         <TouchableDebounce
           onPress={() => {
             this.routingAction();
@@ -105,6 +109,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#FEFAD4",
     justifyContent: "center",
     alignItems: "center"
+  },
+  rules: {
+    color: "black",
+    fontSize: 20,
+    fontWeight: "400",
+    width: 300,
+    textAlign: "center",
+    marginBottom: 20
   },
   button: {
     width: 300,
