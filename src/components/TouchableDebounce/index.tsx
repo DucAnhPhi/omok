@@ -4,6 +4,7 @@ import { TouchableOpacity } from "react-native";
 interface Props {
   children: any;
   style: any;
+  disabled?: boolean;
   onPress: () => void;
 }
 
@@ -23,6 +24,7 @@ export default class TouchableDebounce extends React.Component<Props> {
         onPress={debounce(() => {
           this.props.onPress();
         }, 500)}
+        disabled={this.props.disabled}
       >
         {this.props.children}
       </TouchableOpacity>

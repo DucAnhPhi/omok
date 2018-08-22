@@ -1,14 +1,9 @@
 import React from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import CustomInput from "../../components/CustomInput";
+import TouchableDebounce from "../../components/TouchableDebounce";
 import Backend from "../../lib/backend";
 import { updateProfile } from "../../store/profile";
 
@@ -102,7 +97,7 @@ class CreateProfileModal extends React.Component<Props, State> {
         {this.state.errorMsg.length !== 0 && (
           <Text style={styles.errorMsg}>{this.state.errorMsg}</Text>
         )}
-        <TouchableOpacity
+        <TouchableDebounce
           onPress={() => {
             this.createProfile();
           }}
@@ -110,7 +105,7 @@ class CreateProfileModal extends React.Component<Props, State> {
           style={[styles.button, this.state.invalid && styles.disabled]}
         >
           <Text style={styles.buttonLabel}>SUBMIT</Text>
-        </TouchableOpacity>
+        </TouchableDebounce>
       </View>
     );
   }
