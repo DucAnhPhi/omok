@@ -43,6 +43,7 @@ export default class GameListView extends React.Component<Props, State> {
     this.gameListSocket = SocketIOClient.connect(
       `${URI}/gameList`,
       {
+        path: '/api',
         query: { token: firebaseToken }
       }
     );

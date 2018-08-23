@@ -74,6 +74,7 @@ class OnlineGameView extends React.Component<Props, State> {
     this.gameSocket = SocketIOClient.connect(
       `${URI}/game`,
       {
+        path: '/api',
         query: { token: firebaseToken }
       }
     );
