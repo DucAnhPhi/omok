@@ -1,4 +1,4 @@
-package com.omok;
+package com.omokfiveinarow;
 
 import android.support.multidex.MultiDex;
 import android.content.Context;

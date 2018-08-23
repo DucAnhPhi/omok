@@ -1,4 +1,4 @@
-package com.omok;
+package com.omokfiveinarow;
 
 import com.reactnativenavigation.controllers.SplashActivity;
 import android.content.Intent;
