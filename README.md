@@ -2,6 +2,8 @@
 
 - Omok or 'Five in a Row' is a 1v1 multiplayer game.
 
+- Play Store: https://play.google.com/store/apps/details?id=com.omokfiveinarow
+
 ## architecture outline
 
 ### app
